@@ -38,3 +38,15 @@ print(SigmoidProba(1, 5, val_max=0.9, end_by_one=True))#test fonction
 """
 
 #ne se termine pas tout à fait à 1 ms très proche-->acceptable ?
+
+import random
+
+def tryToMating(individu, D, Dmate, Tproba):
+    if random.random() < Tproba[individu['durée']]:
+        Dmate.update({individu, D[individu['partenaire']]})
+    else:
+        individu['durée']+=1
+    return None
+        
+    
+
