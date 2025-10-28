@@ -1,11 +1,6 @@
 import numpy as np
 import uuid
 
-def distribution(nb_players, alpha=3, beta=3):
-    values = np.random.beta(alpha, beta, nb_players)
-    values2= np.round(values*10)
-    return values2.tolist()
-
 class Player:
     def __init__(self, value):
         self.id = str(uuid.uuid4())[:8]
@@ -16,6 +11,9 @@ class Player:
 
     def __repr__(self):
         return f"Joueur({self.id}, valeur={self.value:.2f}, état={self.candidate})"
+
+def distribution(nb_players, alpha=3, beta=3):
+    return np.random.beta(alpha, beta, nb_players).tolist()
 
 
 def creer_population(nb_players):

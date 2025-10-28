@@ -1,7 +1,7 @@
 from __future__ import annotations
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-from Player_class import Player
+from test import Player
 import uuid
 
 app = FastAPI() #create the fastApi app
@@ -11,8 +11,8 @@ class ConnectionManager:
         self.active_connections: dict[str, WebSocket,Player] = {}
 
     async def connect(self, websocket: WebSocket, client_id: str):
-        await websocket.accept()
-        self.active_connections[client_id] = websocket
+        await websocket.accept() # server accept player
+        self.active_connections[client_id] = websocket,Player(0) # store server connect,Player class
         await self.broadcast(f"Client {client_id} joined the server")
 
     def disconnect(self, client_id: str):
