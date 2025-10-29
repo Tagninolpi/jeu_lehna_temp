@@ -1,71 +1,82 @@
 from __future__ import annotations
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-from test import Player
+from fastapi.staticfiles import StaticFiles
+from test import *
 import uuid
+import asyncio
+import json
 
 app = FastAPI() #create the fastApi app
+app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html
+nb_classes = 10
 
 class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[str, WebSocket,Player] = {}
 
     async def connect(self, websocket: WebSocket, client_id: str):
-        await websocket.accept() # server accept player
-        self.active_connections[client_id] = websocket,Player(0) # store server connect,Player class
-        await self.broadcast(f"Client {client_id} joined the server")
+        if len(self.active_connections) <10:
+            await websocket.accept() # server accept player
+            self.active_connections[client_id] = websocket,Player(nb_classes,client_id) # store server connect,Player class
+            await self.send(client_id,{
+                "type":"up_val",
+                "payload": {
+                    "status":"You connected, the game will start when enough players connect",
+                    "my_value": self.active_connections[client_id][1].value
+                    }})
+        else:
+            await websocket.accept()
+            await self.send(client_id,{
+                "type":"up_val",
+                "payload": {
+                    "status":"The game already started, wait for the next game"
+                    }})
+            await websocket.close()
 
     def disconnect(self, client_id: str):
-        self.active_connections.pop(client_id, None)
+        self.active_connections.pop(client_id, None)# remove player from list
 
-    async def broadcast(self, message: str):
-        for conn in self.active_connections.values():
-            await conn.send_text(message)
+    async def send(self, client_id: str, type_: str, payload: dict):
+        ws = self.active_connections.get(client_id)
+        if ws:
+            await ws.send_json({"type": type_, "payload": payload})
+
+    async def broadcast(self, type_: str, payload: dict):
+        for ws in self.active_connections.values():
+            await ws.send_json({"type": type_, "payload": payload})
 
 manager = ConnectionManager()
-# htlm client
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>FastAPI WebSocket Test</title>
-    </head>
-    <body>
-        <h1>WebSocket Test Client</h1>
-        <div id="messages"></div>
-        <input type="text" id="messageText" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages');
-                var message = document.createElement('div');
-                message.textContent = event.data;
-                messages.appendChild(message);
-            };
-            function sendMessage() {
-                var input = document.getElementById('messageText');
-                ws.send(input.value);
-                input.value = '';
-            }
-        </script>
-    </body>
-</html>
-"""
+
+
+
+def give_all_new_partner():
+
+
 @app.get("/")
-async def get():
-    return HTMLResponse(html)
+def get_index():
+    with open("static/index.html") as f:
+        return HTMLResponse(f.read())
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     client_id = str(uuid.uuid4())[:8]  # assign unique ID
-    await manager.connect(websocket, client_id)
+    await manager.connect(websocket, client_id) #create player connection and class
+    print(f"ID={client_id}, class={manager.active_connections[client_id][1]}")
+    
+    while len(manager.active_connections)<10:
+        await asyncio.sleep(0.1)
+    
+    give_all_new_partner()
 
+    
     try:
         while True:
-            data = await websocket.receive_text()
-            await manager.broadcast(f"{client_id} said: {data}")
-    except WebSocketDisconnect:
+            raw_msg = await websocket.receive_text()
+            msg = json.loads(raw_msg)  # parse JSON
+            action_type = msg.get("type")
+
+    except WebSocketDisconnect:# if disconnect
         manager.disconnect(client_id)
-    except Exception as e:
+    except Exception as e: # if other error
         print(f"Error: {e}")
