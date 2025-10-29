@@ -11,34 +11,22 @@ def SigmoidProba(sigma :int, T :int, round_to=3)->tuple:
 		t+=1
 		L.append(round(1/(1+math.exp(-1*sigma*(t-T))), round_to))
 	return tuple(L)
-
-print(SigmoidProba(1, 5))
+#test fonction
+#print(SigmoidProba(1, 5))
 
 import random
 
-def tryToMating(individu, D, Dmate, Tproba):
-    if random.random() < Tproba[individu['durée']]:
-        keys=[k for k, v in D.items() if D[k]==individu or k==individu['partenaire']]
-        print(keys)
-        Dmate[keys[0]]=D.pop(keys[0])
-        Dmate[keys[1]]=D.pop(keys[1])
+def tryToMating(id_individu, D, Tproba)->bool:
+    #id_individu: id de l'individu ds D
+    #D:dict contenant individus
+    #Tproba:tuple des proba de passer en mate
+    print(Tproba)
+    if random.random() < Tproba[D[id_individu]['durée']]:
+        res=True
     else:
-        individu['durée']+=1
-    return None
+        res=False
+    return res
 
-#test fonction
-"""
-D={0:{'durée':0, 'candidat':3, 'partenaire':1}, 1:{'durée':0, 'candidat':4, 'partenaire':0}, 5:{'durée':0, 'candidat':-1, 'partenaire':-1}}
-Dmate={8:{'durée':0, 'candidat':-1, 'partenaire':-1}}
-Tproba=SigmoidProba(1, 5)
-
-for i in Tproba:
-    try:
-        tryToMating(D[0], D, Dmate, Tproba)
-        print(Dmate)
-    except KeyError:
-        break
-"""
 
    
 
