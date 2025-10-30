@@ -100,8 +100,10 @@ print(f"Dmate:{Dmate}")
 
 """
 à améliorer :
-    -   faire les tâches en pl boucles
-    -   commenter plus le code
-    -   prsuivre les tests
-    (-   commencer à imprimer res ds un fichier)
+    1)   transformer le code principal en fonction+le faire fonctionner avc 1 dict de id:player et non dict de dict
+    2)   prsuivre les tests
+    3)   faire les tâches en pl boucles-->simplifier
+    4)   mettre en commentaire les ges0s de durée d'état
+    5)   commenter plus le code
+    6)  (   commencer à imprimer res ds un fichier)
 """
