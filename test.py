@@ -5,8 +5,8 @@ class Player:
     def __init__(self, class_nb: float, ID: str):
         self.id = ID
         self.value = self.set_value(class_nb)
-        self.candidate = None
-        self.partner = None
+        self.candidate = {}#id:value
+        self.partner = {}#id:value
         self.step = None
 
     def __repr__(self):
@@ -39,6 +39,24 @@ class Player:
         return class_value
 
 
+def encounter(ids: List[str], seed: Optional[int] = None, avoid: Optional[set[tuple[str, str]]] = None):
+    rng = np.random.default_rng(seed)
+
+    def pair_from_ids(lst: List[str]):
+        return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
+
+    if not avoid:
+        rng.shuffle(ids)
+        return pair_from_ids(ids)
+
+    avoid_norm = {tuple(sorted(x)) for x in avoid}
+    for _ in range(20): 
+        rng.shuffle(ids)
+        pairs = pair_from_ids(ids)
+        if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
+            return pairs
+    return pair_from_ids(ids)
+
 
 
 # def distribution(nb_players: int, alpha: float = 3.0, beta: float = 3.0, seed: Optional[int] = None):
@@ -58,24 +76,6 @@ class Player:
 #     return population, thresholds
 
 
-def encounter(population: List[Player], seed: Optional[int] = None, avoid: Optional[set[tuple[str, str]]] = None):
-    ids = [p.id for p in population]
-    rng = np.random.default_rng(seed)
-
-    def pair_from_ids(lst: List[str]):
-        return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
-
-    if not avoid:
-        rng.shuffle(ids)
-        return pair_from_ids(ids)
-
-    avoid_norm = {tuple(sorted(x)) for x in avoid}
-    for _ in range(20): 
-        rng.shuffle(ids)
-        pairs = pair_from_ids(ids)
-        if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
-            return pairs
-    return pair_from_ids(ids)
 
 
 # def assigner_classes(population: List[Player], nb_classes: int):
@@ -96,14 +96,14 @@ def create_players(classe,nb_p):
 
 def test_2(pl,cls=10):
     players = create_players(cls,pl)
-    previous_pairs = encounter(players)
+    previous_pairs = encounter(players,[])
     print(previous_pairs)
     for i in range(10):
         next_pairs = encounter(players,avoid=previous_pairs)
         print(next_pairs)
         previous_pairs = next_pairs
 
-test_2(4)
+#test_2(4)
         
 
 
