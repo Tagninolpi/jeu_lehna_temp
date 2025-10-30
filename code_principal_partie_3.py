@@ -97,3 +97,11 @@ for i in Dmate:
 
 print(f"D:{D}")
 print(f"Dmate:{Dmate}")
+
+"""
+à améliorer :
+    -   faire les tâches en pl boucles
+    -   commenter plus le code
+    -   prsuivre les tests
+    (-   commencer à imprimer res ds un fichier)
+"""
