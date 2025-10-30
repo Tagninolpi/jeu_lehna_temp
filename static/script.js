@@ -35,6 +35,6 @@ function update_values(status, my_value, currentPartner, candidate) {
 }
 
 // ---- Sending actions ----
-function ChangePartner() {
+function changePartner() {
     ws.send(JSON.stringify({ type: "change_partner" }));
 }
