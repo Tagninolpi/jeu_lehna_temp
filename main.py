@@ -13,25 +13,23 @@ nb_classes = 10
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: dict[str, WebSocket,Player] = {}
+        self.active_connections: dict[str, WebSocket] = {}
+        self.all_players = {}
 
     async def connect(self, websocket: WebSocket, client_id: str):
         if len(self.active_connections) <10:
             await websocket.accept() # server accept player
-            self.active_connections[client_id] = websocket,Player(nb_classes,client_id) # store server connect,Player class
+            self.active_connections[client_id] = websocket # store server connect
+            self.all_players[client_id] = Player(nb_classes,client_id) #Player class
             await self.send(client_id,{
                 "type":"up_val",
                 "payload": {
                     "status":"You connected, the game will start when enough players connect",
-                    "my_value": self.active_connections[client_id][1].value
+                    "my_value": self.all_players[client_id].value
                     }})
         else:
             await websocket.accept()
-            await self.send(client_id,{
-                "type":"up_val",
-                "payload": {
-                    "status":"The game already started, wait for the next game"
-                    }})
+            await self.send(client_id,"up_val",{"status":"The game already started, wait for the next game"})
             await websocket.close()
 
     def disconnect(self, client_id: str):
@@ -51,6 +49,16 @@ manager = ConnectionManager()
 
 
 def give_all_new_partner():
+    for id,ws in manager.active_connections.items():
+        manager.send(id,"up_val",{
+            "status":"Joined server,waiting for 10 players",
+            "my_value": manager.all_players[id].value
+            })
+
+
+
+
+
 
 
 @app.get("/")

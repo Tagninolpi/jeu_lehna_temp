@@ -85,7 +85,7 @@ def encounter(population: List[Player], seed: Optional[int] = None, avoid: Optio
 #     return population
 
 #test encounter
-'''
+
 def create_players(classe,nb_p):
     players = []
     for i in range(nb_p):
@@ -105,6 +105,6 @@ def test_2(pl,cls=10):
 
 test_2(4)
         
-'''
+
 
 
