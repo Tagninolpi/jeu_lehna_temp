@@ -1,4 +1,37 @@
-# Jeu_LEHNA
+# Jeu interactif – Simulation des biais émotionnels dans le choix du partenaire
+
+## Project description
+
+This project aims to simulate mate choice behavior in a population of individuals.
+
+Inspired by the work of LEHNA (Laboratory of Ecology of Natural and Anthropogenic Hydrosystems), it seeks to model how emotional biases can influence mate selection decisions, sometimes irrationally, but adaptively in the long term.
+
+The final application will take the form of an interactive game allowing multiple players to progress through a simulated breeding season.
+
+This code represents the first phase of development: a Python prototype for testing the matching logic and the distribution of players' "quality values" before integration into a web interface.
+
+## Code description
+
+The Python code provides the foundations of the simulation model, through several key functions and classes:
+
+_class Player
+_
+
+Represents an individual within the population.
+Each player receives a quality value randomly generated according to a Beta(3,3) distribution, which replicates a natural distribution where extreme values ​​are rare.
+
+Main attributes:
+
+- id: unique identifier of the player
+- value: assigned quality class (based on a defined number of classes)
+- candidate, partner: dictionaries to store potential and current partners
+- step: current state of the player in the simulation
+
+Main methods:
+
+- build_class_thresholds(nb_classes): creates the quality class thresholds
+- value_to_class(v, thresholds): converts a continuous value into a discrete class
+- set_value(nb_class): generates a quality value according to the Beta distribution and transforms it into a class
 
 
 
