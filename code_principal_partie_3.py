@@ -1,3 +1,7 @@
+####le code suivant n'est plus utilisé
+####il a été réécrit et intégré à test.py
+
+
 """
 Stockage suggéré :
 
@@ -21,6 +25,18 @@ appelle fonction SigmoidProba(D[i]‘durée_courtship’]) pr tenter de passer e
 si réussite alors renvoie True et il faut mettre les 2 individus en état « mating » et les transferer de Di à Dmate
 sinon (échec) renvoie False
 """
+from test.py import Player
+
+"""
+class Player:
+    def __init__(self, class_nb: float, ID: str):
+        self.id = ID
+        self.value = self.set_value(class_nb)
+        self.candidate = {}#id:value
+        self.partner = {}#id:value
+        self.step = None
+"""
+
 import 	fonctions_projet_partie_3 as FlogACh #Fonctions for LOGic After CHoice
 
 T=FlogACh.SigmoidProba(1, 5)#tuples des proba de mating
