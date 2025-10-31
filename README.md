@@ -14,9 +14,8 @@ This code represents the first phase of development: a Python prototype for test
 
 The Python code provides the foundations of the simulation model, through several key functions and classes:
 
-_class Player
-_
-
+**class Player
+**
 Represents an individual within the population.
 Each player receives a quality value randomly generated according to a Beta(3,3) distribution, which replicates a natural distribution where extreme values ​​are rare.
 
