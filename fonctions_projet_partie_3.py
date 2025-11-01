@@ -1,3 +1,6 @@
+
+####ATTENTION : ce fichier n'est plus utilisé car les fonctions de ce fichier sont devenues des méthodes de l'objet Player
+
 import math
 
 def SigmoidProba(sigma :int, T :int, round_to=3)->tuple:
