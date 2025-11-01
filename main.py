@@ -3,11 +3,13 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from test import *
+from test import Player
 import uuid
 import asyncio
 import json
 import uvicorn
+import math
+import random
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,30 +20,40 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html
 nb_classes = 10
+players = 6
 
 class Connectionserver:
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
         self.all_players = {}
+        #lists
         self.active_players = []
         self.mating_players = []
         self.previous_pairs = []
         self.current_pairs = []
-        self.players_change_partner = []
+        self.changing_players = []
+
+        #vars
         self.game_status = "waiting for player"
+        self.round = 0
+
+        #helper_vars
+        self.sigmoid_proba = self.sigmoid_probability(1,5)
+
+        #events
         self.ev_lobby_full = asyncio.Event()
         self.ev_players_start_choose = asyncio.Event()
         self.ev_players_choose_finish = asyncio.Event()
 
 
     async def connect(self, websocket: WebSocket, client_id: str):
-        if len(self.active_connections) <10:
+        if len(self.active_connections) <players:
             await websocket.accept() # server accept player
             self.active_connections[client_id] = websocket # store server connect
             self.all_players[client_id] = Player(nb_classes,client_id) #Player class
             self.active_players.append(client_id)
-            await self.up_val(client_id,my_value=self.all_players[client_id].value)
-            await self.broadcast(f"You connected, the game will start soon, waiting for {10-len(server.all_players)} players")
+            await self.send_player_update(client_id)
+            await self.broadcast(f"You connected, the game will start soon, waiting for {players-len(server.all_players)} players")
         else:
             await websocket.accept()
          
@@ -49,34 +61,137 @@ class Connectionserver:
     def disconnect(self, client_id: str):
         self.active_connections.pop(client_id)# remove player from list
 
-    async def up_val(self, client_id: str,status=None,my_value=None,candidate=None,currentPartner=None):
+    async def send_status(self, client_id: str, message: str):
+        """Send only a status message to one client."""
         ws = self.active_connections.get(client_id)
         if ws:
-            await ws.send_json({"type": "up_val", "payload": {
-                "status": status,
-                "my_value": my_value,
-                "candidate": candidate,
-                "currentPartner":currentPartner
-            }})
+            await ws.send_json({"type": "status_update", "payload": message})
+
+    async def send_player_update(self, client_id: str):
+        """Send the full player data to the client."""
+        player = self.all_players[client_id]
+        ws = self.active_connections.get(client_id)
+        if ws:
+            await ws.send_json({
+                "type": "player_update",
+                "payload": {
+                    "id": player.id,
+                    "value": player.value,
+                    "candidate": player.candidate,
+                    "candidate_id": player.candidate_id,
+                    "partner": player.partner,
+                    "partner_id": player.partner_id,
+                    "courtship_timer": player.courtship_timer,
+                    "mating": player.mating
+                }
+            })
 
     async def broadcast(self,msg):
         for ws in self.active_connections.values():
-            await ws.send_json({"type": "up_val", "payload": {"status":msg}})
+            await ws.send_json({"type": "status_update", "payload": msg})
+        
+    def after_choose(self):
+        # list de tous les ids de joueurs qui veulent changer = changing_players
+        # list de tous les ids de joueurs actif = active_players
+        remove=[]
+        for id in self.changing_players:
+            me = server.all_players[id]
+            candidate_id = me.candidate_id
+            #si je veux changer et mon candidat veux aussi changer
+            if candidate_id in self.changing_players:
+                me.partner = me.candidate
+                me.partner_id = me.candidate_id
+                me.courtship_timer =0
+            else:# sinon je ne peux pas changer enlevé de la list pour changer
+                remove.append(id)
+        for id in remove:
+            self.changing_players.remove(id)
+        # pour tous les joueurs
+        for player_id in self.active_players:
+            me = server.all_players[player_id]
+            partner_id = me.partner_id
+            if partner_id in self.changing_players and not(me.id in self.changing_players):
+                me.partner = None
+                me.partner_id = None
+                me.courtship_timer = -1
+            else:
+                if me.courtship_timer == -1:
+                    me.courtship_timer = 0
+                else:
+                    me.courtship_timer += 1
+    
+    def sigmoid_probability(self,sigma :int, T :int, round_to=3)->tuple:
+        ##retourne tuples des valeurs d'1 sigmoide avc 1 pas de tps de 1
+        #T : absisse du pt d'inflexion
+        #sigma : pente du pt d'inflexion
+        #round_to : nb de decimales à qui l'on arrondit
+        t=0
+        L=[round(1/(1+math.exp(T*sigma)), round_to)]
+        while L[t]<1:
+            t+=1
+            L.append(round(1/(1+math.exp(-1*sigma*(t-T))), round_to))
+        return tuple(L)
+    
+    async def tryToMate(self)->bool:
+        #id_individu: id de l'individu ds D
+        #D:dict contenant individus
+        #Tproba:tuple des proba de passer en mate
+        pairs = []
+        for id in self.active_players:
+            if self.all_players[id].partner_id:
+                if any(id in t for t in pairs):# if id in pairs
+                    pass
+                else:#if not in pairs add me and partnerto it
+                    pairs.append((id,self.all_players[id].partner_id))
+        for pair in pairs:
+            me = self.all_players[pair[0]]
+            partner = self.all_players[pair[1]]
+            courtship_time = me.courtship_timer
+            if me.partner_id:
+                if not(courtship_time ==-1) and me.mating == "waiting":
+                    proba =random.random()
+                    mate_threachold = self.sigmoid_proba[courtship_time]
+                    if proba < mate_threachold:
+                        self.mating_players.append(me.id)
+                        self.mating_players.append(partner.id)
+                        self.active_players.remove(me.id)
+                        self.active_players.remove(partner.id)
+
+                        me.mating = "mate"
+                        partner.mating = "mate"
+                        await self.send_player_update(me.id)
+                        await self.send_player_update(partner.id)
+    
+    def end_turn_clean_up(self):
+        self.changing_players.clear()
+        self.round += 1
+        if len(self.active_players) == 0  or self.round == 10:
+            server.game_status = "Game end"
+        self.ev_players_choose_finish.clear()
+        self.ev_players_start_choose.clear()
+
+
+
+
+
 
 server = Connectionserver()
 
-async def give_all_new_partner():
+async def give_all_new_candidate():
     #create pairs
-    server.current_pairs = encounter(server.active_players,avoid=server.previous_pairs)
+    server.current_pairs = Player.encounter(server.active_players,avoid=server.previous_pairs)
+    server.previous_pairs = server.current_pairs
     # change the value of candidat in player class
     for pair in server.current_pairs:
         id_1 = pair[0]
         id_2 = pair[1]
         server.all_players[id_1].candidate = server.all_players[id_2].value
+        server.all_players[id_1].candidate_id = server.all_players[id_2].id
         server.all_players[id_2].candidate = server.all_players[id_1].value
+        server.all_players[id_2].candidate_id = server.all_players[id_1].id
     #send the value of the candidate
-    for id in server.active_connections:
-        await server.up_val(id,candidate= server.all_players[id].id)
+    for id in server.active_players:
+        await server.send_player_update(id)
     await server.broadcast("You got a new candidate")
 
 async def choose_timer(time):
@@ -94,33 +209,45 @@ def get_index():
 async def websocket_endpoint(websocket: WebSocket):
     client_id = str(uuid.uuid4())[:8]  # assign unique ID
     await server.connect(websocket, client_id) #create player connection and class
-    if len(server.all_players) == 10:
-        server.ev_lobby_full.set()
-    await server.ev_players_start_choose.wait()
-    try:
-        while server.game_status == "player_choose":
-            raw_msg = await websocket.receive_text()
-            msg = json.loads(raw_msg)  # parse JSON
-            action_type = msg.get("type")
-            if action_type == "change_partner" and not(client_id in server.players_change_partner):
-                await server.up_val(client_id,status="You decided to change partner")
-                server.players_change_partner.append(client_id)
-                if len(server.players_change_partner) == 10:
-                    server.ev_players_choose_finish.set()
+    while server.game_status != "Game end":
+        if len(server.all_players) == players:
+            server.ev_lobby_full.set()
+        await server.ev_players_start_choose.wait()
+        try:
+            while server.game_status == "player_choose":
+                raw_msg = await websocket.receive_text()
+                msg = json.loads(raw_msg)  # parse JSON
+                action_type = msg.get("type")
+                if action_type == "change_partner" and not(client_id in server.changing_players):
+                    await server.send_status(client_id,"You decided to change partner")
+                    server.changing_players.append(client_id)
+                    if len(server.changing_players) == players:
+                        server.ev_players_choose_finish.set()
 
-    except WebSocketDisconnect:# if disconnect
-        server.disconnect(client_id)
-    except Exception as e: # if other error
-        print(f"Error: {e}")
+        except WebSocketDisconnect:# if disconnect
+            server.disconnect(client_id)
+        except Exception as e: # if other error
+            print(f"Error: {e}")
 
 async def main_loop():
+    
     while server.game_status != "Game end":
         await server.ev_lobby_full.wait()
-        await give_all_new_partner()
-        timer = asyncio.create_task(choose_timer(60))
+        await server.broadcast(f"start of round {server.round}")
+        await asyncio.sleep(3)
+        await give_all_new_candidate()
+        timer = asyncio.create_task(choose_timer(20))
         server.game_status = "player_choose"
         server.ev_players_start_choose.set()
         await server.ev_players_choose_finish.wait()
         timer.cancel()
         await server.broadcast("Choosing periode is over")
-        server.game_status = "Game end"
+        server.after_choose()
+        await server.tryToMate()
+        server.end_turn_clean_up()
+        await server.broadcast(f"end of round {server.round}")
+        await asyncio.sleep(3)
+        print(f"end of round {server.round}")
+    await server.broadcast("End of the game")
+        
+

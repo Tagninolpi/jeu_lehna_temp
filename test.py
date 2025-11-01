@@ -5,9 +5,12 @@ class Player:
     def __init__(self, class_nb: float, ID: str):
         self.id = ID
         self.value = self.set_value(class_nb)
-        self.candidate = {}#id:value
-        self.partner = {}#id:value
-        self.step = None
+        self.candidate = None #value
+        self.candidate_id = None #id
+        self.partner = None #value
+        self.partner_id = None #id
+        self.courtship_timer = -1
+        self.mating = "waiting"
 
     def __repr__(self):
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
@@ -37,25 +40,41 @@ class Player:
         class_value = self.value_to_class(beta_value,thresholds)
         #print(class_value)
         return class_value
+    
+    @staticmethod
+    def encounter(ids: List[str], seed: Optional[int] = None, avoid: Optional[set[tuple[str, str]]] = None):
+        rng = np.random.default_rng(seed)
 
+        def pair_from_ids(lst: List[str]):
+            return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
 
-def encounter(ids: List[str], seed: Optional[int] = None, avoid: Optional[set[tuple[str, str]]] = None):
-    rng = np.random.default_rng(seed)
+        if not avoid:
+            rng.shuffle(ids)
+            return pair_from_ids(ids)
 
-    def pair_from_ids(lst: List[str]):
-        return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
-
-    if not avoid:
-        rng.shuffle(ids)
+        avoid_norm = {tuple(sorted(x)) for x in avoid}
+        for _ in range(20): 
+            rng.shuffle(ids)
+            pairs = pair_from_ids(ids)
+            if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
+                return pairs
         return pair_from_ids(ids)
 
-    avoid_norm = {tuple(sorted(x)) for x in avoid}
-    for _ in range(20): 
-        rng.shuffle(ids)
-        pairs = pair_from_ids(ids)
-        if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
-            return pairs
-    return pair_from_ids(ids)
+
+
+
+'''
+1groupe = 2pairs
+
+for every player if i yes and candidate yes => yes no change
+if i yes and candidate no => no 
+if i yes partner = candidate
+if partner yes =celib 
+
+
+
+'''
+
 
 
 
@@ -85,7 +104,7 @@ def encounter(ids: List[str], seed: Optional[int] = None, avoid: Optional[set[tu
 #     return population
 
 #test encounter
-
+'''
 def create_players(classe,nb_p):
     players = []
     for i in range(nb_p):
@@ -104,7 +123,5 @@ def test_2(pl,cls=10):
         previous_pairs = next_pairs
 
 #test_2(4)
-        
 
-
-
+'''
