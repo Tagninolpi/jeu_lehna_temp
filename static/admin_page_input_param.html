@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>paramètrage et lancement du lobby</title>
+  </head>
+  <body>
+    <h1>paramètrage et lancement du lobby</h1>
+    <!--
+    paramètres de la partie
+    nb de classes
+    durée+nb de saison
+    tps max pr choix
+    last_option
+    
+    affichage nb joueurs connectés
+    
+    bouton lancer partie
+    -->
+    <div><strong>Nombre de joueurs actuellement connectés:</strong> <span id="Player_number">0</span></div>
+
+    
+    <form>
+      <div><strong>nombres de classes de valeurs reproductives:</strong> <input type="text"/></div>
+      <div><strong>durée de la saison de reproduction (en nombre de pas de temps) :</strong> <input type="text"/></div>
+      <div><strong>nombre de saisons de reproduction :</strong> <input type="text" value="1"/></div>
+      <div><strong>temps maximal dédié au choix à chaque tour :</strong> <input type="text" value="30"/></div>
+      <div>
+        <strong>paramètres de la loi de probabilité de passer en mating (loi sigmoïde)</strong>
+          <ul>
+            <li>
+              <label for id="T">moyenne du nombre de pas de temps necessaire pour passer en etat de mating (T de la loi sigmoïde)</label>
+              <input id="T" type="text" value="5"/>
+            </li>
+            <li>
+              <label for id="sigma">pente de la fonction de répartition pour une absisse egale a la moyenne de la loi de probabilite (sigma de la loi sigmoide)</label>
+              <input id="sigma" type="text" value="1"/>
+            </li>
+          </ul>
+      </div>
+      <div><strong>Les joueurs en etat de "courtship" passent-ils en etat de mating à la fin de la saison de la partie ?:</strong>
+        <label for="LastOptionTrue">Oui : </label>
+        <input type="radio" id="LastOptionTrue" name="last_option" value="True"/>
+        <label for="LastOptionFalse">Non : </label>
+        <input type="radio" id="LastOptionFalse" name="last_option" value="False"/>
+      </div>
+      <button onclick="changePartner()">lancer le lobby</button>
+    </form>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
