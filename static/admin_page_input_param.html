@@ -20,10 +20,44 @@
 
     
     <form>
-      <div><strong>nombres de classes de valeurs reproductives:</strong> <input type="text"/></div>
-      <div><strong>durée de la saison de reproduction (en nombre de pas de temps) :</strong> <input type="text"/></div>
-      <div><strong>nombre de saisons de reproduction :</strong> <input type="text" value="1"/></div>
-      <div><strong>temps maximal dédié au choix à chaque tour :</strong> <input type="text" value="30"/></div>
+
+      <div>
+        <strong>nombres de classes de valeurs reproductives:</strong><input type="text"/>
+        <br>visible par le joueur ?<br>
+        <label for="NbClassVisible?True">Oui : </label>
+        <input type="radio" id="NbClassVisible?" name="NbClassVisible?True" value="True" required/>
+        <label for="NbClassVisible?False">Non : </label>
+        <input type="radio" id="NbClassVisible?" name="NbClassVisible?False" value="False" required/>
+      </div>
+
+      <div>
+        <strong>durée de la saison de reproduction (en nombre de pas de temps) :</strong>
+        <input type="text"/>
+        <br>visible par le joueur ?<br>
+        <label for="DureeVisible?True">Oui : </label>
+        <input type="radio" id="DureeVisible?" name="DureeVisible?True" value="True" required/>
+        <label for="DureeVisible?False">Non :</label>
+        <input type="radio" id="DureeVisible?" name="DureeVisible?False" value="False" required/>
+      </div>
+
+      <div>
+        <strong>nombre de saisons de reproduction :</strong> <input type="text" value="1"/>
+        <br>visible par le joueur ?<br>
+        <label for="NbSaisonsVisibles?True">Oui : </label>
+        <input type="radio" id="NbSaisonsVisibles?" name="NbSaisonsVisibles?True" value="True" required/>
+        <label for="NbSaisonsVisibles?False">Non :</label>
+        <input type="radio" id="NbSaisonsVisibles?" name="NbSaisonsVisibles?False" value="False" required/>
+      </div>
+
+      <div>
+        <strong>temps maximal dédié au choix à chaque tour :</strong> <input type="text" value="30"/>
+        <br>visible par le joueur ?<br>
+        <label for="TmaxTourVisible?True">Oui : </label>
+        <input type="radio" id="TmaxTourVisible?" name="TmaxTourVisible?True" value="True" required/>
+        <label for="TmaxTourVisible?False">Non :</label>
+        <input type="radio" id="TmaxTourVisible?" name="TmaxTourVisible?False" value="False" required/>
+      </div>
+
       <div>
         <strong>paramètres de la loi de probabilité de passer en mating (loi sigmoïde)</strong>
           <ul>
@@ -35,17 +69,30 @@
               <label for id="sigma">pente de la fonction de répartition pour une absisse egale a la moyenne de la loi de probabilite (sigma de la loi sigmoide)</label>
               <input id="sigma" type="text" value="1"/>
             </li>
+            <br>visible par le joueur ?<br>
+            <label for="ParamProbaVisible?True">Oui : </label>
+            <input type="radio" id="ParamProbaVisible?" name="ParamProbaVisible?True" value="True" required/>
+            <label for="ParamProbaVisible?False">Non :</label>
+            <input type="radio" id="ParamProbaVisible?" name="ParamProbaVisible?False" value="False" required/>
           </ul>
       </div>
-      <div><strong>Les joueurs en etat de "courtship" passent-ils en etat de mating à la fin de la saison de la partie ?:</strong>
+
+      <div>
+        <strong>Les joueurs en etat de "courtship" passent-ils en etat de mating à la fin de la saison de la partie ?:</strong>
         <label for="LastOptionTrue">Oui : </label>
-        <input type="radio" id="LastOptionTrue" name="last_option" value="True"/>
+        <input type="radio" id="LastOptionTrue" name="last_option" value="True" required/>
         <label for="LastOptionFalse">Non : </label>
-        <input type="radio" id="LastOptionFalse" name="last_option" value="False"/>
+        <input type="radio" id="LastOptionFalse" name="last_option" value="False" required/>
+        <br>visible par le joueur ?<br>
+        <label for="Last_optionVisible?True">Oui : </label>
+        <input type="radio" id="Last_optionVisible?" name="Last_optionVisible?True" value="True" required/>
+        <label for="Last_optionVisible?False">Non :</label>
+        <input type="radio" id="Last_optionVisible?" name="Last_optionVisible?False" value="False" required/>
       </div>
       <button onclick="changePartner()">lancer le lobby</button>
+
     </form>
 
-    <script src="/static/script.js"></script>
+    <script src="/static/Launch_lobby.js"></script>
   </body>
 </html>
