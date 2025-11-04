@@ -15,61 +15,60 @@
     
     bouton lancer partie
     -->
-    <form>
-
+    <form method="get">
       <div>
-        <strong>nombres de classes de valeurs reproductives:</strong><input type="text"/>
+        <strong>nombres de classes de valeurs reproductives:</strong><input type="text" required/>
         <br>visible par le joueur ?<br>
         <label for="NbClassVisible?True">Oui : </label>
-        <input type="radio" id="NbClassVisible?" name="NbClassVisible?True" value="True" required/>
+        <input type="radio" id="NbClassVisible?True" name="NbClassVisible?" value="True" required/>
         <label for="NbClassVisible?False">Non : </label>
-        <input type="radio" id="NbClassVisible?" name="NbClassVisible?False" value="False" required/>
+        <input type="radio" id="NbClassVisible?False" name="NbClassVisible?" value="False" required/>
       </div>
 
       <div>
         <strong>durée de la saison de reproduction (en nombre de pas de temps) :</strong>
-        <input type="text"/>
+        <input type="text" required/>
         <br>visible par le joueur ?<br>
         <label for="DureeVisible?True">Oui : </label>
-        <input type="radio" id="DureeVisible?" name="DureeVisible?True" value="True" required/>
+        <input type="radio" id="DureeVisible?True" name="DureeVisible?" value="True" required/>
         <label for="DureeVisible?False">Non :</label>
-        <input type="radio" id="DureeVisible?" name="DureeVisible?False" value="False" required/>
+        <input type="radio" id="DureeVisible?False" name="DureeVisible?" value="False" required/>
       </div>
 
       <div>
-        <strong>nombre de saisons de reproduction :</strong> <input type="text" value="1"/>
+        <strong>nombre de saisons de reproduction :</strong> <input type="text" value="1" required/>
         <br>visible par le joueur ?<br>
         <label for="NbSaisonsVisibles?True">Oui : </label>
-        <input type="radio" id="NbSaisonsVisibles?" name="NbSaisonsVisibles?True" value="True" required/>
+        <input type="radio" id="NbSaisonsVisibles?True" name="NbSaisonsVisibles?" value="True" required/>
         <label for="NbSaisonsVisibles?False">Non :</label>
-        <input type="radio" id="NbSaisonsVisibles?" name="NbSaisonsVisibles?False" value="False" required/>
+        <input type="radio" id="NbSaisonsVisibles?False" name="NbSaisonsVisibles?" value="False" required/>
       </div>
 
       <div>
-        <strong>temps maximal dédié au choix à chaque tour :</strong> <input type="text" value="30"/>
+        <strong>temps maximal dédié au choix à chaque tour :</strong> <input type="text" value="30" required/>
         <br>visible par le joueur ?<br>
         <label for="TmaxTourVisible?True">Oui : </label>
-        <input type="radio" id="TmaxTourVisible?" name="TmaxTourVisible?True" value="True" required/>
+        <input type="radio" id="TmaxTourVisible?True" name="TmaxTourVisible?" value="True" required/>
         <label for="TmaxTourVisible?False">Non :</label>
-        <input type="radio" id="TmaxTourVisible?" name="TmaxTourVisible?False" value="False" required/>
+        <input type="radio" id="TmaxTourVisible?False" name="TmaxTourVisible?" value="False" required/>
       </div>
 
       <div>
         <strong>paramètres de la loi de probabilité de passer en mating (loi sigmoïde)</strong>
           <ul>
             <li>
-              <label for id="T">moyenne du nombre de pas de temps necessaire pour passer en etat de mating (T de la loi sigmoïde)</label>
-              <input id="T" type="text" value="5"/>
+              <label for="T">moyenne du nombre de pas de temps necessaire pour passer en etat de mating (T de la loi sigmoïde)</label>
+              <input id="T" type="text" value="5" required/>
             </li>
             <li>
-              <label for id="sigma">pente de la fonction de répartition pour une absisse egale a la moyenne de la loi de probabilite (sigma de la loi sigmoide)</label>
-              <input id="sigma" type="text" value="1"/>
+              <label for="sigma">pente de la fonction de répartition pour une absisse egale a la moyenne de la loi de probabilite (sigma de la loi sigmoide)</label>
+              <input id="sigma" type="text" value="1" required/>
             </li>
             <br>visible par le joueur ?<br>
             <label for="ParamProbaVisible?True">Oui : </label>
-            <input type="radio" id="ParamProbaVisible?" name="ParamProbaVisible?True" value="True" required/>
+            <input type="radio" id="ParamProbaVisible?True" name="ParamProbaVisible?" value="True" required/>
             <label for="ParamProbaVisible?False">Non :</label>
-            <input type="radio" id="ParamProbaVisible?" name="ParamProbaVisible?False" value="False" required/>
+            <input type="radio" id="ParamProbaVisible?False" name="ParamProbaVisible?" value="False" required/>
           </ul>
       </div>
 
@@ -81,11 +80,11 @@
         <input type="radio" id="LastOptionFalse" name="last_option" value="False" required/>
         <br>visible par le joueur ?<br>
         <label for="Last_optionVisible?True">Oui : </label>
-        <input type="radio" id="Last_optionVisible?" name="Last_optionVisible?True" value="True" required/>
+        <input type="radio" id="Last_optionVisible?True" name="Last_optionVisible?" value="True" required/>
         <label for="Last_optionVisible?False">Non :</label>
-        <input type="radio" id="Last_optionVisible?" name="Last_optionVisible?False" value="False" required/>
+        <input type="radio" id="Last_optionVisible?False" name="Last_optionVisible?" value="False" required/>
       </div>
-      <button onclick="changePartner()">lancer le lobby</button>
+      <button onclick="LaunchLobby()">lancer le lobby</button>
 
     </form>
 
