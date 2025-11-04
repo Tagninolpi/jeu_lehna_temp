@@ -1,23 +1,15 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Partner Test</title>
-  </head>
-  <body>
-    <h1>Partner Interface</h1>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu LEHNA - Accueil</title>
+  <style>body{font-family:Arial,sans-serif;padding:40px;text-align:center}button{padding:12px 24px;margin:12px;font-size:18px;cursor:pointer}</style>
+</head>
+<body>
+  <h1>Bienvenue dans le jeu LEHNA</h1>
+  <p>Choisissez votre mode :</p>
 
-    <div><strong>My ID:</strong> <span id="id">None</span></div>
-    <div><strong>My Value:</strong> <span id="value">None</span></div>
-    <div><strong>Current Partner:</strong> <span id="partner">None</span></div>
-    <div><strong>Partner ID:</strong> <span id="partner_id">None</span></div>
-    <div><strong>Candidate:</strong> <span id="candidate">None</span></div>
-    <div><strong>Candidate ID:</strong> <span id="candidate_id">None</span></div>
-    <div><strong>Courtship Timer:</strong> <span id="courtship_timer">None</span></div>
-    <div><strong>Mating:</strong> <span id="mating">waiting</span></div>
-    <div><strong>Status:</strong> <span id="status">None</span></div>
-
-    <button onclick="changePartner()">Change</button>
-
-    <script src="/static/script.js"></script>
-  </body>
+  <button onclick="location.href='player.html'">Mode Joueur</button>
+  <button onclick="location.href='admin.html'">Mode Admin</button>
+</body>
 </html>
