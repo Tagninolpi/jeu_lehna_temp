@@ -41,6 +41,15 @@ class Player:
         #print(class_value)
         return class_value
     
+    def reset_player(self,class_nb):
+        self.value = self.set_value(class_nb)
+        self.candidate = None #value
+        self.candidate_id = None #id
+        self.partner = None #value
+        self.partner_id = None #id
+        self.courtship_timer = -1
+        self.mating = "waiting"
+    
     @staticmethod
     def encounter(ids: List[str], seed: Optional[int] = None, avoid: Optional[set[tuple[str, str]]] = None):
         rng = np.random.default_rng(seed)
@@ -59,6 +68,7 @@ class Player:
             if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
                 return pairs
         return pair_from_ids(ids)
+    
 
 
 

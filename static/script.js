@@ -1,5 +1,8 @@
 //webSocket connection to server
-const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+const wsHost = window.location.host; // e.g., "127.0.0.1:8000" or "jeu-lehna-temp.onrender.com"
+const ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`);
+
 
 
 // ---- Incoming messages ----

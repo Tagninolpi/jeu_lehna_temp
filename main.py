@@ -58,20 +58,30 @@ class Connectionserver:
             await websocket.accept()
          
 
-    def disconnect(self, client_id: str):
-        self.active_connections.pop(client_id)# remove player from list
-
+    async def disconnect(self, client_id: str):
+        websocket = self.active_connections.pop(client_id, None)
+        if websocket:
+            try:
+                await websocket.close()
+            except Exception:
+                pass
     async def send_status(self, client_id: str, message: str):
         """Send only a status message to one client."""
         ws = self.active_connections.get(client_id)
-        if ws:
+        if not ws:
+            return
+        try:
             await ws.send_json({"type": "status_update", "payload": message})
+        except Exception as e:
+            await self.disconnect(client_id)
 
     async def send_player_update(self, client_id: str):
         """Send the full player data to the client."""
         player = self.all_players[client_id]
         ws = self.active_connections.get(client_id)
-        if ws:
+        if not (player and ws):
+            return
+        try:
             await ws.send_json({
                 "type": "player_update",
                 "payload": {
@@ -85,10 +95,19 @@ class Connectionserver:
                     "mating": player.mating
                 }
             })
+        except Exception as e:
+            await self.disconnect(client_id)
 
     async def broadcast(self,msg):
-        for ws in self.active_connections.values():
-            await ws.send_json({"type": "status_update", "payload": msg})
+        to_remove = []
+        for cid, ws in self.active_connections.items():
+            try:
+                await ws.send_json({"type": "status_update", "payload": msg})
+            except Exception as e:
+                print(f"⚠️ broadcast: erreur avec {cid} → {e}")
+                to_remove.append(cid)
+        for cid in to_remove:
+            await self.disconnect(cid)
         
     def after_choose(self):
         # list de tous les ids de joueurs qui veulent changer = changing_players
@@ -170,6 +189,33 @@ class Connectionserver:
         self.ev_players_choose_finish.clear()
         self.ev_players_start_choose.clear()
 
+    def reset_game_state(self):
+        # reset uniquement ce qui concerne la partie
+        self.active_players.clear()
+        for id,player in self.all_players.items():
+            player.reset_player(nb_classes)
+            self.active_players.append(id)
+        self.mating_players.clear()
+        self.previous_pairs.clear()
+        self.current_pairs.clear()
+        self.changing_players.clear()
+
+        # réinitialise les variables de jeu
+        self.game_status = "waiting for player"
+        self.round = 0
+
+        # réinitialise les events
+        self.ev_lobby_full.clear()
+        self.ev_players_start_choose.clear()
+        self.ev_players_choose_finish.clear()
+
+    async def end_game(self): # reinitialyse the server for a new start
+        await self.broadcast("End of the game")
+        await asyncio.sleep(3)
+        self.reset_game_state()
+            
+
+
 
 
 
@@ -209,45 +255,46 @@ def get_index():
 async def websocket_endpoint(websocket: WebSocket):
     client_id = str(uuid.uuid4())[:8]  # assign unique ID
     await server.connect(websocket, client_id) #create player connection and class
-    while server.game_status != "Game end":
-        if len(server.all_players) == players:
-            server.ev_lobby_full.set()
-        await server.ev_players_start_choose.wait()
-        try:
-            while server.game_status == "player_choose":
-                raw_msg = await websocket.receive_text()
-                msg = json.loads(raw_msg)  # parse JSON
-                action_type = msg.get("type")
-                if action_type == "change_partner" and not(client_id in server.changing_players):
-                    await server.send_status(client_id,"You decided to change partner")
-                    server.changing_players.append(client_id)
-                    if len(server.changing_players) == players:
-                        server.ev_players_choose_finish.set()
-
-        except WebSocketDisconnect:# if disconnect
-            server.disconnect(client_id)
-        except Exception as e: # if other error
-            print(f"Error: {e}")
+    while True:
+        while server.game_status != "Game end":
+            if len(server.all_players) == players:# and server.game_status == "Waiting for player":
+                server.ev_lobby_full.set()
+            await server.ev_players_start_choose.wait()
+            try:
+                while server.game_status == "player_choose":
+                    raw_msg = await websocket.receive_text()
+                    msg = json.loads(raw_msg)  # parse JSON
+                    action_type = msg.get("type")
+                    if action_type == "change_partner" and not(client_id in server.changing_players):
+                        await server.send_status(client_id,"You decided to change partner")
+                        server.changing_players.append(client_id)
+                        if len(server.changing_players) == players:
+                            server.ev_players_choose_finish.set()
+            except WebSocketDisconnect:# if disconnect
+                await server.disconnect(client_id)
+            except Exception as e: # if other error
+                print(f"Error: {e}")
 
 async def main_loop():
-    
-    while server.game_status != "Game end":
-        await server.ev_lobby_full.wait()
-        await server.broadcast(f"start of round {server.round}")
-        await asyncio.sleep(3)
-        await give_all_new_candidate()
-        timer = asyncio.create_task(choose_timer(20))
-        server.game_status = "player_choose"
-        server.ev_players_start_choose.set()
-        await server.ev_players_choose_finish.wait()
-        timer.cancel()
-        await server.broadcast("Choosing periode is over")
-        server.after_choose()
-        await server.tryToMate()
-        server.end_turn_clean_up()
-        await server.broadcast(f"end of round {server.round}")
-        await asyncio.sleep(3)
-        print(f"end of round {server.round}")
-    await server.broadcast("End of the game")
-        
-
+    while True:
+        while server.game_status != "Game end":
+            if len(server.all_players) != players:
+                await server.ev_lobby_full.wait()
+            await server.broadcast("Game Start")
+            await server.broadcast(f"start of round {server.round}")
+            await asyncio.sleep(3)
+            await give_all_new_candidate()
+            print(server.previous_pairs)
+            timer = asyncio.create_task(choose_timer(3))
+            server.game_status = "player_choose"
+            server.ev_players_start_choose.set()
+            await server.ev_players_choose_finish.wait()
+            timer.cancel()
+            await server.broadcast("Choosing periode is over")
+            server.after_choose()
+            await server.tryToMate()
+            server.end_turn_clean_up()
+            await server.broadcast(f"end of round {server.round}")
+            await asyncio.sleep(3)
+            print(f"end of round {server.round}")
+        await server.end_game()
