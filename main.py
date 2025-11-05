@@ -21,7 +21,7 @@ app = FastAPI(lifespan=lifespan)
 ### app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html 
 # On veut que les fichiers du dossier static soient accessibles directement à la racine, au lieu d’un sous-dossier (sinon = confusion)
 nb_classes = 10
-players = 8
+players = 6
 choose_time = 20
 
 class Connectionserver:
