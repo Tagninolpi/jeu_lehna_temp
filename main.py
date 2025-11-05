@@ -20,7 +20,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html
 nb_classes = 10
-players = 6
+players = 8
+choose_time = 20
 
 class Connectionserver:
     def __init__(self):
@@ -285,7 +286,7 @@ async def main_loop():
             await asyncio.sleep(3)
             await give_all_new_candidate()
             print(server.previous_pairs)
-            timer = asyncio.create_task(choose_timer(3))
+            timer = asyncio.create_task(choose_timer(choose_time))
             server.game_status = "player_choose"
             server.ev_players_start_choose.set()
             await server.ev_players_choose_finish.wait()
