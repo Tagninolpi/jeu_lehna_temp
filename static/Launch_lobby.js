@@ -12,6 +12,7 @@ form.addEventListener('submit', (event) => { //se declenche si sousmission formu
     event.preventDefault(); //prevent usual form of being sent
     
     const formData = new FormData(form);
+    //utilise l'objet formData pour récupérer données sous forme de clés-valeurs id-value sauf pour boutons radio ou l'on a : name-value
     
     //conversion en objet :
     
