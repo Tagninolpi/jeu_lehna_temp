@@ -18,7 +18,8 @@ async def lifespan(app: FastAPI):
     # optional: cleanup code goes here
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html
+### app.mount("/static", StaticFiles(directory="static"), name="static")# link to js and html 
+# On veut que les fichiers du dossier static soient accessibles directement à la racine, au lieu d’un sous-dossier (sinon = confusion)
 nb_classes = 10
 players = 8
 choose_time = 20
@@ -247,10 +248,12 @@ async def choose_timer(time):
         await server.broadcast(f"time remaining : {time-i} seconds")
     server.ev_players_choose_finish.set()
 
-@app.get("/")
-def get_index():
-    with open("static/index.html") as f:
-        return HTMLResponse(f.read())
+### On peut supprimer car StaticFiles(html=True) fait le boulot
+
+#@app.get("/")
+#def get_index():
+    #with open("static/index.html") as f:
+        #return HTMLResponse(f.read())
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -299,3 +302,5 @@ async def main_loop():
             await asyncio.sleep(3)
             print(f"end of round {server.round}")
         await server.end_game()
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static") #Pour que index.html devienne la page d’accueil et que player.html + admin.html soient accessibles simplement
