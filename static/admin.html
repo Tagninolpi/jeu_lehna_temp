@@ -15,7 +15,8 @@
     
     bouton lancer partie
     -->
-    <form method="get">
+    <script src="Launch_lobby.js"></script>
+    <form id="param">
       <div>
         <strong>nombres de classes de valeurs reproductives:</strong><input type="text" required/>
         <br>visible par le joueur ?<br>
@@ -84,10 +85,8 @@
         <label for="Last_optionVisible?False">Non :</label>
         <input type="radio" id="Last_optionVisible?False" name="Last_optionVisible?" value="False" required/>
       </div>
-      <button onclick="LaunchLobby()">lancer le lobby</button>
+      <button type="submit">lancer le lobby</button>
 
     </form>
-
-    <script src="/static/Launch_lobby.js"></script>
   </body>
 </html>
