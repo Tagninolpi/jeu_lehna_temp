@@ -1,4 +1,6 @@
 //webSocket connection to server
+console.log("✅ script.js loaded!");
+
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
 const wsHost = window.location.host;
 let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`);
