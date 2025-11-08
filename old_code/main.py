@@ -67,6 +67,7 @@ class Connectionserver:
                 await websocket.close()
             except Exception:
                 pass
+            
     async def send_status(self, client_id: str, message: str):
         """Send only a status message to one client."""
         ws = self.active_connections.get(client_id)
