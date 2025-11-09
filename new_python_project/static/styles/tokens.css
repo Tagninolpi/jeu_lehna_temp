@@ -1,0 +1,49 @@
+/*import de la police*/
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Corps de page */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f6f2e9; /* crème */
+  color: #222;
+  font-family: "Press Start 2P", monospace, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Titres */
+h1, h2, h3 {
+  font-weight: normal;
+  text-align: center;
+}
+
+/* Boutons */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px 20px;
+  border: 2px solid #222;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+button:hover {
+  background: #222;
+  color: #fff;
+}
+
+/* Inputs */
+input, select {
+  font-family: inherit;
+  padding: 8px;
+  border: 2px solid #222;
+  background: white;
+}
+
+/* Centrage simple */
+.center {
+  text-align: center;
+  margin-top: 40px;
+}

@@ -1,0 +1,4 @@
+/* En gros, ca sert à organiser l’interface, décider où les éléments se placent à l’écran.
+Dans player on a plusieurs informations en même temps (timer, statut, valeur, partenaire, candidat, et tout), il faut une structure claire pour ne pas tout mélanger quoi.
+Sans layout, tout reste empilé en colonne et l’interface ressemble à une page de texte, pas à un jeu.
+Avec layout, on pourra tout organiser et rendre le gameplay lisible et agréable. */
