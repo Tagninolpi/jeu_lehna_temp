@@ -38,6 +38,7 @@ class Server:
     # game functions
     async def start_game(self):
         if len(self.connections.lobby[0]) % 2 == 0:
+            self.connections.game.game_status = "active"
             self.lobby_state = "closed"
             print("game start")
             await self.connections.change_page_for_all_in(self.connections.lobby[0],"player")
