@@ -1,3 +1,4 @@
+import asyncio
 class Observer:
     def __init__(self, server):
         self.server = server  # store a reference to the server
@@ -23,7 +24,7 @@ class Observer:
                     print(f"{button} is not valid")
             elif page_name == "admin_lobby":
                 if button == "start_game":
-                    await self.server.start_game()
+                    asyncio.create_task(self.server.start_game())
                 else:
                     print(f"{button} is not valid")
             elif page_name == "player":

@@ -16,6 +16,7 @@ class Server:
         
         self.timer = 0
 
+    # on client message recieve 
     async def join_lobby(self,client_id):
         if self.lobby_state == "opened":
             self.connections.lobby[0].append(client_id)
@@ -34,6 +35,7 @@ class Server:
         self.connections.lobby[0] = []
         await self.connections.change_page(client_id,"admin_lobby")
 
+    # game functions
     async def start_game(self):
         if len(self.connections.lobby[0]) % 2 == 0:
             self.lobby_state = "closed"
@@ -42,13 +44,13 @@ class Server:
             await asyncio.sleep(2)
             await self.add_players_to_game()
             await self.game_loop()
-            self.reset_all()
+            await self.reset_all()
 
     async def add_players_to_game(self):
         for client_id in self.connections.lobby[0]:
             self.connections.game.all_players[client_id] = Player(10,client_id)
             self.connections.game.active_players.append(client_id)
-            await self.connections.update_player_info(client_id,None)
+            await self.connections.update_player_info(client_id)
             
 
     async def game_loop(self):
@@ -57,17 +59,15 @@ class Server:
             self.connections.game.changing_players.clear()
             self.connections.game.give_all_new_candidate()
             for id in self.connections.game.active_players:
-                await self.connections.update_player_info(id,None)
+                await self.connections.update_player_info(id)
             self.timer = asyncio.create_task(self.start_timer(30))
-            print("waiting")
             await self.ev_players_choose_finish.wait()
-            print("continue")
             self.timer.cancel()
             self.connections.game.after_choose()
             me_id,partner_id = self.connections.game.tryToMate()
             if me_id and partner_id:
-                await self.connections.update_player_info(me_id,None)
-                await self.connections.update_player_info(partner_id,None)
+                await self.connections.update_player_info(me_id)
+                await self.connections.update_player_info(partner_id)
             self.connections.game.end_turn_clean_up()
             if len(self.connections.game.active_players) == 0  or self.connections.game.round == 10:
                 self.connections.game.game_status = "Game end"
@@ -76,12 +76,9 @@ class Server:
 
     async def start_timer(self,time):
         for i in range(time):
-            print(time)
             await asyncio.sleep(1)
             print(i)
             #await self.connections.broadcast_game_status_update(f"time remaining : {time-i} seconds")
-            print("awaitfinish")
-        
         self.connections.game.game_status = "choose_finish"
         self.ev_players_choose_finish.set()
 
@@ -122,7 +119,7 @@ class Server:
         # Send everyone to main_menu
         coros = []
         for client_id, ws in self.connections.websockets.items():
-            coros.append(self.connections.change_page(client_id, "main_menu"))
+            coros.append(self.connections.change_page(client_id, "home"))
         
         if coros:
             await asyncio.gather(*coros)

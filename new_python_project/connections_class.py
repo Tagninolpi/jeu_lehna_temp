@@ -7,9 +7,9 @@ class Connections():
         
 
     async def disconnect(self, client_id: str):
-        websocket = self.websockets.pop(client_id, None)
         if client_id in self.lobby[0]:
             self.lobby[0].remove(client_id)
+        websocket = self.websockets.pop(client_id, None)
         if websocket:
             try:
                 print("diconnect")
@@ -17,7 +17,7 @@ class Connections():
             except Exception as e:
                 print(e)
 
-    async def update_player_info(self, client_id: str,player_info):
+    async def update_player_info(self, client_id: str):
         """Send the full player data to the client."""
         ws = self.websockets.get(client_id)
         try:
