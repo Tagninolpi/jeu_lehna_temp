@@ -1,26 +1,35 @@
-console.log("✅ main.js chargé");
+//webSocket connection to server
+console.log("✅ script.js loaded!");
 
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
 const wsHost = window.location.host;
-const app = document.getElementById("app");
 let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`);
+
+ws.addEventListener("error", () => {
+  try {
+    if (ws && ws.readyState !== WebSocket.OPEN) {
+      ws.close();
+    }
+  } catch (_) {}
+  ws = new WebSocket("ws://127.0.0.1:8000/ws");
+});
 
 // ---- Incoming messages ----
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
   const { type, payload } = msg;
-
+  
+  const DisplayData=JSON.parse(event.data)
+  
+  display(DisplayData)
+  
   switch (type) {
-    case "change_page":
-      loadFragment(payload);//admin_lobby,admin,home,player_lobby,player
+    case "status_update":
+      update_status(payload);
       break;
 
     case "player_update":
       update_player(payload);
-      break;
-
-    case "status_update":
-      updateStatus(msg.payload);
       break;
 
     default:
@@ -28,16 +37,12 @@ ws.onmessage = (event) => {
   }
 };
 
-function updateStatus(newStatus) {
-  const statusEl = document.getElementById("Status");
-  if (statusEl) {
-    statusEl.textContent = newStatus;
-  } else {
-    console.warn("⚠️ Élément #status introuvable dans player.html");
-  }
+// ---- Function to update partner and candidate ----
+function update_status(message) {
+  if (message != null)
+    document.getElementById("status").textContent = message;
 }
 
-// update player view
 function update_player(p) {
   p.id != null && (document.getElementById("id").textContent = p.id);
   p.value != null && (document.getElementById("value").textContent = p.value);
@@ -49,34 +54,17 @@ function update_player(p) {
   p.mating != null && (document.getElementById("mating").textContent = p.mating);
 }
 
-function button_click(page,button,payload) {
+// ---- Sending actions ----
+function changePartner() {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({"page": page,"button": button,"message": payload}));
+    ws.send(JSON.stringify({ type: "change_partner" }));
   } else {
     console.warn("WebSocket non connecté — action ignorée");
   }
 }
 
-// reads all form fields and builds a payload object
-function getPayload(form) {
-  const payload = {};
-  const inputs = form.querySelectorAll("input");
+//display parameters
 
-  inputs.forEach((input) => {
-    const key = input.dataset.key || input.name;
-    if (!key) return;
-
-    if (input.type === "radio") {
-      if (input.checked) payload[key] = input.value;
-    } else {
-      payload[key] = input.value;
-    }
-  });
-
-  return payload;
-}
-
-//data = dict {"ClassesNB":valeur, ...}
 function display(data){
     const lobbyParameter=["ClassesNb", "duration", "SeasonNb", "MaxTime", "SigmoidProba", "LastOption"]; //doit contenir toutes les id d'infos possible sinon bug !
     lobbyParameter.forEach(id => {
@@ -98,17 +86,3 @@ function display(data){
         }
     });
 }
-
-// change de page
-async function loadFragment(name) {
-  try {
-    const response = await fetch(`./fragments/${name}.html`);
-    if (!response.ok) throw new Error("Fragment introuvable");
-    const html = await response.text();
-    app.innerHTML = html;
-  } catch (err) {
-    app.innerHTML = `<p style="color:red;text-align:center;">Erreur de chargement : ${err.message}</p>`;
-  }
-}
-
-loadFragment("home");

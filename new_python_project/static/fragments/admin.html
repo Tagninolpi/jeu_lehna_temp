@@ -70,9 +70,8 @@
     <input type="radio" id="Last_optionVisible?False" name="Last_optionVisible?" value="False" required/>
   </div>
 
-  <button type="submit">lancer le lobby</button>
-  <div style="margin-top:16px;">
-    <button data-fragment="admin_lobby">Aller au lobby</button>
-    <button data-fragment="home">🏠 Retour à l’accueil</button>
-  </div>
+  <button type="button" 
+          onclick="button_click('admin_para','create_lobby', getPayload(this.form))">
+    Lancer le lobby
+  </button>
 </form>

@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import random
-
+import asyncio
 class Game:
     def __init__(self,player_value_class_nb:int,nb_players:int,time_to_choose_new_partner:int,sigmoid_sigma:float,sigmoid_turn_to_mate:float):
 
@@ -26,12 +26,13 @@ class Game:
 
         self.sigmoid_proba_decimal_nb = 3
         self.round = 0
+        self.game_status = "active"
 
         self.sigmoid_proba = self.sigmoid_probability()
 
     def sigmoid_probability(self)->tuple:
         t=0
-        L=[]
+        L=[round(1/(1+math.exp(self.sigmoid_proba_turn_to_mate*self.sigmoid_proba_sigma)), 3)]
         while L[t]<1:
             L.append(round(1/(1+math.exp(-1*self.sigmoid_proba_sigma*(t-self.sigmoid_proba_turn_to_mate))), self.sigmoid_proba_decimal_nb))
             t+=1
@@ -126,11 +127,9 @@ class Game:
                         self.active_players.remove(partner.id)
                         me.mating = "mate"
                         partner.mating = "mate"
-
-
-                        #await self.send_player_update(me.id)
-                        #await self.send_player_update(partner.id)
-
+                        return me.id,partner.id
+        return 0,0
+                    
     def end_turn_clean_up(self):
         self.changing_players.clear()
         self.round += 1

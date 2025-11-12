@@ -37,6 +37,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             raw_msg = await websocket.receive_text()
             msg = json.loads(raw_msg)
+            print(f"recieved : {msg}")
             await server.message_queue.put((client_id, msg))
     except WebSocketDisconnect:# if disconnect
         await server.connections.disconnect(client_id)

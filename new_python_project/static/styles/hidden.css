@@ -1,0 +1,3 @@
+.hidden{ /*style gere par JavaScript : applique si donnee non transmise (admin a decide de ne pas le donner au joueur)*/
+	display: none; /*efface de l'affichage web une balise qui applique ce style*/
+}

@@ -10,30 +10,31 @@ class Observer:
             button = msg["button"]
 
             if page_name == "main_menu":
-                if button == "player":
-                    self.server.join_lobby()
-                elif button == "admin":
-                    self.server.become_admin(msg["password"])
+                if button == "player": #done
+                    await self.server.join_lobby(client_id)
+                elif button == "admin": #done
+                    await self.server.become_admin(client_id,msg["message"])
                 else:
                     print(f"{button} is not valid")
             elif page_name == "admin_para":
                 if button == "create_lobby":
-                    self.server.create_lobby()
+                    await self.server.create_lobby(client_id,msg["message"])
                 else:
                     print(f"{button} is not valid")
             elif page_name == "admin_lobby":
                 if button == "start_game":
-                    self.server.start_game()
+                    await self.server.start_game()
                 else:
                     print(f"{button} is not valid")
-            elif page_name == "game":
+            elif page_name == "player":
                 if button == "change_partner":
-                    self.server.player_change_partner()
+                    print("funcchange")
+                    await self.server.player_change_partner(client_id)
                 else:
                     print(f"{button} is not valid")
             elif page_name == "admin_game_results":
                 if button == "download":
-                    self.server.download_game_results()
+                    await self.server.download_game_results()
                 else:
                     print(f"{button} is not valid")
             else:
