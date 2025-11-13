@@ -7,8 +7,9 @@ class Connections():
         
 
     async def disconnect(self, client_id: str):
-        if client_id in self.lobby[0]:
-            self.lobby[0].remove(client_id)
+        lobby_list = self.lobby.get(0) if isinstance(self.lobby, dict) else None
+        if isinstance(lobby_list, list) and client_id in lobby_list:
+            lobby_list.remove(client_id)
         websocket = self.websockets.pop(client_id, None)
         if websocket:
             try:
@@ -81,3 +82,21 @@ class Connections():
         except Exception as e:
             print(f"Disconnecting {client_id} due to error: {e}")
             await self.disconnect(client_id)
+
+    async def update_connected_ammount(self,admin_id):
+        targets = set(self.lobby.get(0, []))
+        targets.add(admin_id)
+        for client_id in targets:
+            ws = self.websockets.get(client_id)
+            if not ws:
+                continue
+
+            try:
+                print("playernb update")
+                await ws.send_json({"type": "value_update", "payload": {
+                    "key": "players_connected",
+                    "value": len(self.lobby.get(0, []))
+                }})
+            except Exception as e:
+                print(f"Disconnecting {client_id} due to error: {e}")
+                await self.disconnect(client_id)

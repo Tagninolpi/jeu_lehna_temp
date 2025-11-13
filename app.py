@@ -24,6 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 @app.get("/")
 async def root():
     return RedirectResponse("/static/index.html")

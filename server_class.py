@@ -9,6 +9,7 @@ class Server:
         self.message_queue = asyncio.Queue()
         self.connections = Connections()
         self.admin_id = None
+        self.admin_page = "main_menu"
         self.games = {}
         self.lobby_state = "closed"
 
@@ -21,17 +22,24 @@ class Server:
         if self.lobby_state == "opened":
             self.connections.lobby[0].append(client_id)
             await self.connections.change_page(client_id,"player_lobby")
+            await self.connections.update_connected_ammount(self.admin_id)
 
     async def become_admin(self,client_id,password):
         print(self.admin_id)
-        if password == 'password' and self.admin_id == None:
+        if password == 'password' and (self.admin_id == None or not(self.admin_id in self.connections.websockets)):
             self.admin_id = client_id
-            await self.connections.change_page(client_id,"admin")
+            if self.admin_page == "main_menu":
+                await self.connections.change_page(client_id,"admin")
+                self.admin_page = "admin"
+            else:
+                await self.connections.change_page(client_id,self.admin_page)
+
             print("is admin")
 
     async def create_lobby(self,client_id,parameters):
         print(parameters)
         self.lobby_state = "opened"
+        self.admin_page = "admin_lobby"
         self.connections.lobby[0] = []
         await self.connections.change_page(client_id,"admin_lobby")
 
@@ -120,7 +128,7 @@ class Server:
         # Send everyone to main_menu
         coros = []
         for client_id, ws in self.connections.websockets.items():
-            coros.append(self.connections.change_page(client_id, "home"))
+            coros.append(self.connections.change_page(client_id, "main_menu"))
         
         if coros:
             await asyncio.gather(*coros)

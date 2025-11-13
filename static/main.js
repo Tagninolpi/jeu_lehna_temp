@@ -12,15 +12,15 @@ ws.onmessage = (event) => {
 
   switch (type) {
     case "change_page":
-      loadFragment(payload);//admin_lobby,admin,home,player_lobby,player
+      loadFragment(payload);//admin_lobby,admin,main_menu,player_lobby,player
       break;
 
     case "player_update":
       update_player(payload);
       break;
 
-    case "status_update":
-      updateStatus(msg.payload);
+    case "value_update":
+      updatevalue(msg.payload.key, msg.payload.value);
       break;
 
     default:
@@ -28,12 +28,12 @@ ws.onmessage = (event) => {
   }
 };
 
-function updateStatus(newStatus) {
-  const statusEl = document.getElementById("Status");
+function updatevalue(type, newvalue) {
+  const statusEl = document.getElementById(type);
   if (statusEl) {
-    statusEl.textContent = newStatus;
+    statusEl.textContent = `Joueurs connectés : ${newvalue}`;
   } else {
-    console.warn("⚠️ Élément #status introuvable dans player.html");
+    console.warn(`⚠️ Élément #${type} introuvable dans le DOM`);
   }
 }
 
@@ -111,4 +111,4 @@ async function loadFragment(name) {
   }
 }
 
-loadFragment("home");
+loadFragment("main_menu");
