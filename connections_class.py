@@ -93,6 +93,7 @@ class Connections():
 
             try:
                 print("playernb update")
+                print(self.lobby,admin_id)
                 await ws.send_json({"type": "value_update", "payload": {
                     "key": "players_connected",
                     "value": len(self.lobby.get(0, []))

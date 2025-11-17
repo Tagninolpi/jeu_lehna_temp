@@ -22,6 +22,7 @@ class Server:
         if self.lobby_state == "opened":
             self.connections.lobby[0].append(client_id)
             await self.connections.change_page(client_id,"player_lobby")
+            await asyncio.sleep(0.01)
             await self.connections.update_connected_ammount(self.admin_id)
 
     async def become_admin(self,client_id,password):
@@ -53,6 +54,7 @@ class Server:
             await asyncio.sleep(2)
             await self.add_players_to_game()
             await self.game_loop()
+            
             await self.reset_all()
 
     async def add_players_to_game(self):
