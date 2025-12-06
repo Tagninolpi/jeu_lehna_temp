@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from fastapi.responses import StreamingResponse
 from contextlib import asynccontextmanager
 
 from server_class import Server
@@ -44,3 +45,18 @@ async def websocket_endpoint(websocket: WebSocket):
         await server.connections.disconnect(client_id)
     except Exception as e: # if other error
         print(f"Error: {e}")
+
+@app.get("/download_csv")
+async def download_csv():
+    csv_file = server.get_game_result()
+
+    # No CSV available? → Tell the browser "nothing to download"
+    if not csv_file:
+        return {"available": False}
+
+    # CSV exists → return file
+    return StreamingResponse(
+        csv_file,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=game_results.csv"}
+    )

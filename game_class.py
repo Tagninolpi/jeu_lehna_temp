@@ -26,13 +26,15 @@ class Game:
 
         self.parameters = {}
 
-        self.round_nb = nb_round
+        self.round_nb = int(nb_round)
 
         self.sigmoid_proba_decimal_nb = 3
         self.round = 0
         self.game_status = "active"
 
         self.sigmoid_proba = self.sigmoid_probability()
+
+        self.game_results = []
 
     def sigmoid_probability(self)->tuple:
         t=0
@@ -137,6 +139,7 @@ class Game:
     def end_turn_clean_up(self):
         self.changing_players.clear()
         self.round += 1
+        print(self.round)
 
 
         #if len(self.active_players) == 0  or self.round == 10:

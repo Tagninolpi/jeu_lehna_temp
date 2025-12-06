@@ -3,6 +3,8 @@ from player_class import Player
 from game_class import Game
 from connections_class import Connections
 import asyncio
+import csv
+import io
 
 class Server:
     def __init__(self):
@@ -16,6 +18,7 @@ class Server:
         self.ev_players_choose_finish = asyncio.Event()
         
         self.timer = 0
+        self.game_results = []
 
     # on client message recieve 
     async def join_lobby(self,client_id):
@@ -57,6 +60,7 @@ class Server:
             self.connections.game.game_status = "active"
             self.lobby_state = "closed"
             print("game start")
+            await self.connections.change_page(self.admin_id,"admin_result")
             await self.connections.change_page_for_all_in(self.connections.lobby[0],"player")
             await asyncio.sleep(2)
             await self.add_players_to_game()
@@ -79,7 +83,7 @@ class Server:
             self.connections.game.give_all_new_candidate()
             for id in self.connections.game.active_players:
                 await self.connections.update_player_info(id)
-            self.timer = asyncio.create_task(self.start_timer(30))
+            self.timer = asyncio.create_task(self.start_timer(self.connections.game.choose_time))
             await self.ev_players_choose_finish.wait()
             self.timer.cancel()
             self.connections.game.after_choose()
@@ -88,6 +92,7 @@ class Server:
                 await self.connections.update_player_info(me_id)
                 await self.connections.update_player_info(partner_id)
             self.connections.game.end_turn_clean_up()
+            self.add_turn_stats_game()
             if len(self.connections.game.active_players) == 0  or self.connections.game.round_nb == self.connections.game.round :
                 self.connections.game.game_status = "Game end"
             else:
@@ -109,9 +114,6 @@ class Server:
             if len(self.connections.game.changing_players) == len(self.connections.game.active_players):
                 self.ev_players_choose_finish.set()
 
-    async def download_game_results(self):
-        pass
-
     async def reset_all(self):
         # Cancel the timer if running
         if self.timer and not self.timer.done():
@@ -122,12 +124,10 @@ class Server:
                 pass
 
         # Reset lobby state
+        self.game_results = self.connections.game.game_results
+        await self.connections.show_download_button(self.admin_id)
         self.lobby_state = "closed"
         self.connections.lobby.clear()
-
-        # Reset admin
-        self.admin_id = None
-        self.connections.admin_id = None
 
         # Reset all games
         self.connections.game = None
@@ -139,7 +139,36 @@ class Server:
         # Send everyone to main_menu
         coros = []
         for client_id, ws in self.connections.websockets.items():
-            coros.append(self.connections.change_page(client_id, "main_menu"))
+            if client_id != self.admin_id:  # do NOT move admin
+                coros.append(self.connections.change_page(client_id, "main_menu"))
         
         if coros:
             await asyncio.gather(*coros)
+
+    def add_turn_stats_game(self):
+        for key,player in self.connections.game.all_players.items():
+            line = {"my_valeur":player.value,
+                    "partner_value":player.partner,
+                    "candidate_value":player.candidate,
+                    "courtship_timer":player.courtship_timer,
+                    "pas de temps":self.connections.game.round}
+            print(line)
+            self.connections.game.game_results.append(line)
+    
+    def get_game_result(self):
+        """
+        Returns a CSV in-memory file from game_results
+        """
+        if not self.game_results:
+            return None
+
+        output = io.StringIO()
+        fieldnames = self.game_results[0].keys()
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for player_info in self.game_results:
+            writer.writerow(player_info)
+
+        output.seek(0)
+        return output

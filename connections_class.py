@@ -66,6 +66,15 @@ class Connections():
         for connections in to_remove:
             await self.disconnect(connections[0],connections[1])
 
+    async def show_download_button(self,admin_id):
+        """Send the full player data to the client."""
+        ws = self.websockets.get(admin_id)
+        try:
+            await ws.send_json({"type": "game_end","payload": 0})
+            print("send json")
+        except Exception as e:
+            await self.disconnect(admin_id)
+
     async def update_player_timer(self,time_msg):
         targets = set(self.lobby.get(0, []))
         for client_id in targets:

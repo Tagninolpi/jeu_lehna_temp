@@ -12,7 +12,7 @@ ws.onmessage = (event) => {
 
   switch (type) {
     case "change_page":
-      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player
+      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result
       break;
 
     case "player_update":
@@ -25,6 +25,10 @@ ws.onmessage = (event) => {
 
     case "player_parameters":
       display(payload);
+      break;
+    
+    case "game_end":
+      showCSVButton();
       break;
 
     default:
@@ -153,3 +157,14 @@ document.addEventListener("click", (e) => {
     btn.style.color = "white";
   }
 });
+
+function downloadCSV() {
+    window.location.href = "/download_csv";
+}
+
+function showCSVButton() {
+    const btn = document.getElementById("download_csv_btn");
+    if (btn) {
+        btn.style.display = "inline-block"; // or "block"
+    }
+}
