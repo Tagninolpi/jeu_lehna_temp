@@ -22,37 +22,45 @@ class Server:
         if self.lobby_state == "opened":
             self.connections.lobby[0].append(client_id)
             await self.connections.change_page(client_id,"player_lobby")
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.05)
             await self.connections.update_connected_ammount(self.admin_id)
+            
 
     async def become_admin(self,client_id,password):
         print(self.admin_id)
         if password == 'password' and (self.admin_id == None or not(self.admin_id in self.connections.websockets)):
             self.admin_id = client_id
+            self.connections.admin_id = client_id
             if self.admin_page == "main_menu":
                 await self.connections.change_page(client_id,"admin")
                 self.admin_page = "admin"
             else:
                 await self.connections.change_page(client_id,self.admin_page)
+                await asyncio.sleep(0.05)
+                await self.connections.update_connected_ammount(self.admin_id)
+
 
             print("is admin")
 
     async def create_lobby(self,client_id,parameters):
-        print(parameters)
+        print(f"parameters{parameters}")
         self.lobby_state = "opened"
         self.admin_page = "admin_lobby"
         self.connections.lobby[0] = []
+        self.connections.game = Game(parameters['NbClass']['value'],parameters['nb_tours_saison']['value'],parameters['TmaxTour']['value'],parameters['sigma']['value'],parameters['npt_moy_before_mating']['value'])
+        self.connections.game.parameters = parameters
         await self.connections.change_page(client_id,"admin_lobby")
 
     # game functions
     async def start_game(self):
-        if len(self.connections.lobby[0]) % 2 == 0:
+        if len(self.connections.lobby[0]) % 2 == 0 and not(len(self.connections.lobby[0])==0):
             self.connections.game.game_status = "active"
             self.lobby_state = "closed"
             print("game start")
             await self.connections.change_page_for_all_in(self.connections.lobby[0],"player")
             await asyncio.sleep(2)
             await self.add_players_to_game()
+            await self.connections.update_game_stat_in_player_view()
             await self.game_loop()
             
             await self.reset_all()
@@ -80,7 +88,7 @@ class Server:
                 await self.connections.update_player_info(me_id)
                 await self.connections.update_player_info(partner_id)
             self.connections.game.end_turn_clean_up()
-            if len(self.connections.game.active_players) == 0  or self.connections.game.round == 10:
+            if len(self.connections.game.active_players) == 0  or self.connections.game.round_nb == self.connections.game.round :
                 self.connections.game.game_status = "Game end"
             else:
                 self.connections.game.game_status = "active"
@@ -89,7 +97,7 @@ class Server:
         for i in range(time):
             await asyncio.sleep(1)
             print(i)
-            #await self.connections.broadcast_game_status_update(f"time remaining : {time-i} seconds")
+            await self.connections.update_player_timer(f"time remaining : {time-i} seconds")
         self.connections.game.game_status = "choose_finish"
         self.ev_players_choose_finish.set()
 
@@ -119,9 +127,10 @@ class Server:
 
         # Reset admin
         self.admin_id = None
+        self.connections.admin_id = None
 
         # Reset all games
-        self.connections.game.reset_game_state()
+        self.connections.game = None
         self.games.clear()
 
         # Clear event
@@ -134,5 +143,3 @@ class Server:
         
         if coros:
             await asyncio.gather(*coros)
-
-        print("✅ All games reset. Players sent to main_menu.")

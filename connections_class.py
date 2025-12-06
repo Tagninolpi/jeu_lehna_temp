@@ -3,7 +3,8 @@ class Connections():
     def __init__(self):
         self.websockets = {}
         self.lobby = {}
-        self.game = Game(10,10,30,2,5)
+        self.game = None
+        self.admin_id = None # neccesary for await self.update_connected_ammount(self.admin_id)
         
 
     async def disconnect(self, client_id: str):
@@ -11,10 +12,12 @@ class Connections():
         if isinstance(lobby_list, list) and client_id in lobby_list:
             lobby_list.remove(client_id)
         websocket = self.websockets.pop(client_id, None)
+        await self.update_connected_ammount(self.admin_id)
         if websocket:
             try:
                 print("diconnect")
                 await websocket.close()
+                
             except Exception as e:
                 print(e)
 
@@ -63,25 +66,36 @@ class Connections():
         for connections in to_remove:
             await self.disconnect(connections[0],connections[1])
 
-    async def broadcast_game_status_update(self, new_status):
-        coros = []
-        to_remove = []
-        print(self.websockets)
-        for client_id in self.game.active_players:
+    async def update_player_timer(self,time_msg):
+        targets = set(self.lobby.get(0, []))
+        for client_id in targets:
             ws = self.websockets.get(client_id)
-            if ws:
-                coros.append(self._safe_send(ws, client_id, new_status))
+            if not ws:
+                continue
+            try:
+                await ws.send_json({"type": "value_update", "payload": {
+                    "key": "status",
+                    "value": time_msg
+                }})
+            except Exception as e:
+                print(f"Disconnecting {client_id} due to error: {e}")
+                await self.disconnect(client_id)
 
-        if coros:
-            await asyncio.gather(*coros)
+    async def update_game_stat_in_player_view(self):
+        targets = set(self.lobby.get(0, []))
+        for client_id in targets:
+            ws = self.websockets.get(client_id)
+            if not ws:
+                continue
 
-    async def _safe_send(self, ws, client_id, new_status):
-        try:
-            print(2)
-            await ws.send_json({"type": "status_update", "payload": new_status})
-        except Exception as e:
-            print(f"Disconnecting {client_id} due to error: {e}")
-            await self.disconnect(client_id)
+            try:
+                await ws.send_json({
+                    "type": "player_parameters",
+                    "payload": self.game.parameters
+                })
+            except Exception as e:
+                print(f"Disconnecting {client_id} due to error: {e}")
+                await self.disconnect(client_id)
 
     async def update_connected_ammount(self,admin_id):
         targets = set(self.lobby.get(0, []))
@@ -96,7 +110,7 @@ class Connections():
                 print(self.lobby,admin_id)
                 await ws.send_json({"type": "value_update", "payload": {
                     "key": "players_connected",
-                    "value": len(self.lobby.get(0, []))
+                    "value": f"Joueurs connectés : {len(self.lobby.get(0, []))}"
                 }})
             except Exception as e:
                 print(f"Disconnecting {client_id} due to error: {e}")

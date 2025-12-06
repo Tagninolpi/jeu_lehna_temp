@@ -12,7 +12,7 @@ ws.onmessage = (event) => {
 
   switch (type) {
     case "change_page":
-      loadFragment(payload);//admin_lobby,admin,main_menu,player_lobby,player
+      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player
       break;
 
     case "player_update":
@@ -23,6 +23,10 @@ ws.onmessage = (event) => {
       updatevalue(msg.payload.key, msg.payload.value);
       break;
 
+    case "player_parameters":
+      display(payload);
+      break;
+
     default:
       console.warn("Unknown message type:", type);
   }
@@ -31,7 +35,7 @@ ws.onmessage = (event) => {
 function updatevalue(type, newvalue) {
   const statusEl = document.getElementById(type);
   if (statusEl) {
-    statusEl.textContent = `Joueurs connectés : ${newvalue}`;
+    statusEl.textContent = newvalue;
   } else {
     console.warn(`⚠️ Élément #${type} introuvable dans le DOM`);
   }
@@ -49,9 +53,9 @@ function update_player(p) {
   p.mating != null && (document.getElementById("mating").textContent = p.mating);
 }
 
-function button_click(page,button,payload) {
+function button_click(page, button, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({"page": page,"button": button,"message": payload}));
+    ws.send(JSON.stringify({ "page": page, "button": button, "message": payload }));
   } else {
     console.warn("WebSocket non connecté — action ignorée");
   }
@@ -60,43 +64,52 @@ function button_click(page,button,payload) {
 // reads all form fields and builds a payload object
 function getPayload(form) {
   const payload = {};
-  const inputs = form.querySelectorAll("input");
 
-  inputs.forEach((input) => {
-    const key = input.dataset.key || input.name;
-    if (!key) return;
+  form.querySelectorAll(".param-item").forEach(item => {
+    const input = item.querySelector("input");
+    const toggle = item.querySelector(".toggle");
 
-    if (input.type === "radio") {
-      if (input.checked) payload[key] = input.value;
-    } else {
-      payload[key] = input.value;
-    }
+    const key = input.name;
+
+    payload[key] = {
+      value: input.value,
+      visible: toggle.dataset.value === "true"
+    };
   });
 
   return payload;
 }
 
-//data = dict {"ClassesNB":valeur, ...}
-function display(data){
-    const lobbyParameter=["ClassesNb", "duration", "SeasonNb", "MaxTime", "SigmoidProba", "LastOption"]; //doit contenir toutes les id d'infos possible sinon bug !
-    lobbyParameter.forEach(id => {
-        const prm=document.getElementById(id)
-        if (!prm) { //permet d'avertir le developpeur qu'1 des id d'information possible dans lobbyParameter ne correspond à aucune balise (masquée ou non) dans l'HTML, et le script continue quand même
-            console.error(`Paramètre #${id} manquant dans le DOM !`);
-            return;
-        }
-        if (id in data) {
-            //prm.classList.remove("hidden") //utile seulement si la décision de masquer ou non un élement peut changer en cours de partie
-            const span = prm.querySelector("span");
-            if (!span) { //si on a pas trouvé de span pour y afficher l'information
-                console.error(`Élément #${id} ne contient pas de <span>.`);
-                return;
-            }
-            span.textContent = data[id];
-        } else {
-            prm.classList.add("hidden")
-        }
-    });
+// data = { "NbClass": { value: 10, visible: true }, ... }
+function display(data) {
+  const lobbyParameter = ["NbClass", "nb_tours_saison", "TmaxTour", "sigma", "npt_moy_before_mating"]; // must match admin parameter names
+
+  lobbyParameter.forEach(id => {
+    const prm = document.getElementById(id);
+    if (!prm) {
+      console.error(`Paramètre #${id} introuvable dans le DOM !`);
+      return;
+    }
+
+    const span = prm.querySelector("span");
+    if (!span) {
+      console.error(`Élément #${id} ne contient pas de <span>.`);
+      return;
+    }
+
+    if (id in data) {
+      span.textContent = data[id].value;
+
+      // toggle hidden class based on visibility
+      if (data[id].visible) {
+        prm.classList.remove("hidden"); // show
+      } else {
+        prm.classList.add("hidden");    // hide
+      }
+    } else {
+      prm.classList.add("hidden"); // hide if missing
+    }
+  });
 }
 
 // change de page
@@ -112,3 +125,31 @@ async function loadFragment(name) {
 }
 
 loadFragment("main_menu");
+
+// ---- Toggle TRUE/FALSE buttons ----
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("toggle")) return;
+
+  const btn = e.target;
+
+  // read current state
+  let value = btn.dataset.value === "true";
+
+  // toggle it
+  value = !value;
+
+  // save it
+  btn.dataset.value = value;
+
+  // update text
+  btn.textContent = value ? "Visible" : "Invisible";
+
+  // update visual color
+  if (value) {
+    btn.style.background = "white";
+    btn.style.color = "black";
+  } else {
+    btn.style.background = "black";
+    btn.style.color = "white";
+  }
+});

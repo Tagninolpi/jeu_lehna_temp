@@ -101,3 +101,33 @@ input[type="checkbox"]:checked {
 /* Petites aides d’espacement */
 .row { display: flex; gap: 12px; flex-wrap: wrap; }
 .center { text-align: center; }
+
+.param-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.param-item label {
+  width: 300px;
+  font-weight: bold;
+}
+
+.toggle {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #000;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle.false {
+  background: black;
+  color: white;
+}
+
+.toggle.true {
+  background: white;
+  color: black;
+}

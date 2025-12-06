@@ -3,7 +3,7 @@ import math
 import random
 import asyncio
 class Game:
-    def __init__(self,player_value_class_nb:int,nb_players:int,time_to_choose_new_partner:int,sigmoid_sigma:float,sigmoid_turn_to_mate:float):
+    def __init__(self,player_value_class_nb:int,nb_round:int,time_to_choose_new_partner:int,sigmoid_sigma:float,sigmoid_turn_to_mate:float):
 
         #Player dict : {id,class}  
         self.all_players = {}
@@ -12,17 +12,21 @@ class Game:
         self.active_players = []
         self.mating_players = []
         self.changing_players = []
-
+ 
         #Player id pairs list : [(p1_id,p3_id),(p2_id,p4_id), ... ]
         self.previous_pairs = []
         self.current_pairs = []
         
         #Game parameters :
-        self.nb_classes = player_value_class_nb
-        self.players = nb_players
-        self.choose_time = time_to_choose_new_partner
-        self.sigmoid_proba_sigma = sigmoid_sigma
-        self.sigmoid_proba_turn_to_mate = sigmoid_turn_to_mate
+        self.nb_classes = int(player_value_class_nb)
+        self.players = 10
+        self.choose_time = int(time_to_choose_new_partner)
+        self.sigmoid_proba_sigma = float(sigmoid_sigma)
+        self.sigmoid_proba_turn_to_mate = float(sigmoid_turn_to_mate)
+
+        self.parameters = {}
+
+        self.round_nb = nb_round
 
         self.sigmoid_proba_decimal_nb = 3
         self.round = 0
