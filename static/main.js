@@ -160,6 +160,8 @@ document.addEventListener("click", (e) => {
 
 function downloadCSV() {
     window.location.href = "/download_csv";
+    loadFragment("main_menu")
+
 }
 
 function showCSVButton() {

@@ -61,6 +61,7 @@ class Server:
             self.lobby_state = "closed"
             print("game start")
             await self.connections.change_page(self.admin_id,"admin_result")
+            self.admin_page = "admin_result"
             await self.connections.change_page_for_all_in(self.connections.lobby[0],"player")
             await asyncio.sleep(2)
             await self.add_players_to_game()
@@ -161,6 +162,8 @@ class Server:
         """
         if not self.game_results:
             return None
+        
+        self.admin_page = "main_menu"
 
         output = io.StringIO()
         fieldnames = self.game_results[0].keys()
