@@ -41,6 +41,7 @@ class Server:
                 await self.connections.change_page(client_id,self.admin_page)
                 await asyncio.sleep(0.05)
                 await self.connections.update_connected_ammount(self.admin_id)
+                await self.connections.show_download_button(self.admin_id)
 
 
             print("is admin")
