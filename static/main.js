@@ -158,11 +158,28 @@ document.addEventListener("click", (e) => {
   }
 });
 
-function downloadCSV() {
-    window.location.href = "/download_csv";
-    loadFragment("main_menu")
+async function downloadCSV() {
+    try {
+        const response = await fetch("/download_csv");
+        if (!response.ok) throw new Error("Erreur téléchargement CSV");
 
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "results.csv";
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        // Switch page AFTER download
+        loadFragment("admin");
+    } catch (err) {
+        console.error("❌ Erreur CSV:", err);
+    }
 }
+
 
 function showCSVButton() {
     const btn = document.getElementById("download_csv_btn");

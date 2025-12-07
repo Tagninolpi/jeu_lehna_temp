@@ -164,7 +164,8 @@ class Server:
         if not self.game_results:
             return None
         
-        self.admin_page = "main_menu"
+        self.admin_page = "admin" 
+        print(self.admin_page)
 
         output = io.StringIO()
         fieldnames = self.game_results[0].keys()
