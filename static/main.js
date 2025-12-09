@@ -55,6 +55,12 @@ function update_player(p) {
   p.partner_id != null && (document.getElementById("partner_id").textContent = p.partner_id);
   p.courtship_timer != null && (document.getElementById("courtship_timer").textContent = p.courtship_timer);
   p.mating != null && (document.getElementById("mating").textContent = p.mating);
+
+  if (p.button) {
+    document.getElementById("change").style.display = "none";
+  } else {
+    document.getElementById("change").style.display = "inline-block";
+  }
 }
 
 function button_click(page, button, payload) {
@@ -123,6 +129,9 @@ async function loadFragment(name) {
     if (!response.ok) throw new Error("Fragment introuvable");
     const html = await response.text();
     app.innerHTML = html;
+    if (name =="player"){
+      document.getElementById("change").style.display = "none"
+    }
   } catch (err) {
     app.innerHTML = `<p style="color:red;text-align:center;">Erreur de chargement : ${err.message}</p>`;
   }

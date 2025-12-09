@@ -49,6 +49,7 @@ class Server:
     async def create_lobby(self,client_id,parameters):
         print(f"parameters{parameters}")
         self.lobby_state = "opened"
+        print(self.lobby_state)
         self.admin_page = "admin_lobby"
         self.connections.lobby[0] = []
         self.connections.game = Game(parameters['NbClass']['value'],parameters['nb_tours_saison']['value'],parameters['TmaxTour']['value'],parameters['sigma']['value'],parameters['npt_moy_before_mating']['value'])
@@ -112,11 +113,14 @@ class Server:
         print(self.connections.game.changing_players)
         if not client_id in self.connections.game.changing_players:
             self.connections.game.changing_players.append(client_id)
-            print("change")
+            self.connections.game.all_players[client_id].accept_candidate = True
+            self.connections.game.all_players[client_id].mating = "candidate accepted"
+            await self.connections.update_player_info(client_id)
+            #print("change")
             if len(self.connections.game.changing_players) == len(self.connections.game.active_players):
                 self.ev_players_choose_finish.set()
 
-    async def reset_all(self):
+    async def reset_all(self,all=False):
         # Cancel the timer if running
         if self.timer and not self.timer.done():
             self.timer.cancel()
@@ -126,8 +130,9 @@ class Server:
                 pass
 
         # Reset lobby state
-        self.game_results = self.connections.game.game_results
-        await self.connections.show_download_button(self.admin_id)
+        if all:
+            self.game_results = self.connections.game.game_results
+            await self.connections.show_download_button(self.admin_id)
         self.lobby_state = "closed"
         self.connections.lobby.clear()
 
@@ -143,6 +148,10 @@ class Server:
         for client_id, ws in self.connections.websockets.items():
             if client_id != self.admin_id:  # do NOT move admin
                 coros.append(self.connections.change_page(client_id, "main_menu"))
+            elif all:
+                self.admin_page = "main_menu"
+                self.admin_id = None
+                coros.append(self.connections.change_page(client_id, "main_menu"))
         
         if coros:
             await asyncio.gather(*coros)
@@ -150,12 +159,18 @@ class Server:
     def add_turn_stats_game(self):
         for key,player in self.connections.game.all_players.items():
             line = {"my_valeur":player.value,
+                    "my_id":player.id,
                     "partner_value":player.partner,
+                    "partner_id":player.partner_id,
                     "candidate_value":player.candidate,
+                    "candidate_id":player.candidate_id,
+                    "accept_candidate":player.accept_candidate,
                     "courtship_timer":player.courtship_timer,
                     "pas de temps":self.connections.game.round}
             print(line)
             self.connections.game.game_results.append(line)
+            if player.mating != "mate":
+                player.accept_candidate = False
     
     def get_game_result(self):
         """

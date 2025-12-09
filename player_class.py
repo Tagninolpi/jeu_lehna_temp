@@ -7,8 +7,9 @@ class Player:
         self.candidate_id = None #id
         self.partner = None #value
         self.partner_id = None #id
-        self.courtship_timer = -1
+        self.courtship_timer = 0
         self.mating = "waiting"
+        self.accept_candidate = False
 
     def __repr__(self):
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
@@ -61,5 +62,5 @@ class Player:
         self.candidate_id = None #id
         self.partner = None #value
         self.partner_id = None #id
-        self.courtship_timer = -1
+        self.courtship_timer = 0
         self.mating = "waiting"

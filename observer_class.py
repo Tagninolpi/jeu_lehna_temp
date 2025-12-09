@@ -33,9 +33,9 @@ class Observer:
                     await self.server.player_change_partner(client_id)
                 else:
                     print(f"{button} is not valid")
-            elif page_name == "admin_game_results":
-                if button == "download":
-                    await self.server.download_game_results()
+            elif page_name == "admin_result":
+                if button == "reset_game":
+                    await self.server.reset_all(True)
                 else:
                     print(f"{button} is not valid")
             else:

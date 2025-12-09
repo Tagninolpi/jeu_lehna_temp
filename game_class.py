@@ -91,7 +91,7 @@ class Game:
             if candidate_id in self.changing_players:
                 me.partner = me.candidate
                 me.partner_id = me.candidate_id
-                me.courtship_timer =0
+                me.courtship_timer = "c"
             else:# sinon je ne peux pas changer enlevé de la list pour changer
                 remove.append(id)
         for id in remove:
@@ -100,13 +100,20 @@ class Game:
         for player_id in self.active_players:
             me = self.all_players[player_id]
             partner_id = me.partner_id
+            # mon partenaire change mais pas moi
             if partner_id in self.changing_players and not(me.id in self.changing_players):
                 me.partner = None
                 me.partner_id = None
                 me.courtship_timer = -1
             else:
-                if me.courtship_timer == -1:
-                    me.courtship_timer = 0
+                # rien ne change
+                #je devien courtship    
+                if me.courtship_timer == "c":
+                    me.courtship_timer = 1
+                    #je suis celib 
+                elif me.courtship_timer <= 0:
+                    me.courtship_timer -= 1
+                    #courtship
                 else:
                     me.courtship_timer += 1
                 
@@ -123,7 +130,7 @@ class Game:
             partner = self.all_players[pair[1]]
             courtship_time = me.courtship_timer
             if me.partner_id:
-                if not(courtship_time ==-1) and me.mating == "waiting":
+                if courtship_time >0 and me.mating != "mate":
                     proba =random.random()
                     mate_threachold = self.sigmoid_proba[courtship_time]
                     if proba < mate_threachold:
@@ -133,6 +140,8 @@ class Game:
                         self.active_players.remove(partner.id)
                         me.mating = "mate"
                         partner.mating = "mate"
+                        me.courtship_timer = 0
+                        partner.courtship_timer = 0
                         return me.id,partner.id
         return 0,0
                     
@@ -140,6 +149,9 @@ class Game:
         self.changing_players.clear()
         self.round += 1
         print(self.round)
+        for id,player in self.all_players.items():
+            if player.mating != "mate":
+                player.mating = "waiting"
 
 
         #if len(self.active_players) == 0  or self.round == 10:

@@ -41,7 +41,8 @@ class Connections():
                     "partner": player.partner,
                     "partner_id": player.partner_id,
                     "courtship_timer": player.courtship_timer,
-                    "mating": player.mating
+                    "mating": player.mating,
+                    "button": player.accept_candidate
                 }
             }
     
@@ -50,7 +51,7 @@ class Connections():
         ws = self.websockets.get(client_id)
         try:
             await ws.send_json({"type": "change_page","payload": new_page})
-            print("send json")
+            #print("send json")
         except Exception as e:
             await self.disconnect(client_id)
 
@@ -71,7 +72,7 @@ class Connections():
         ws = self.websockets.get(admin_id)
         try:
             await ws.send_json({"type": "game_end","payload": 0})
-            print("send json")
+            #print("send json")
         except Exception as e:
             await self.disconnect(admin_id)
 
