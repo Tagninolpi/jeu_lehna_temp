@@ -38,5 +38,10 @@ class Observer:
                     await self.server.reset_all(True)
                 else:
                     print(f"{button} is not valid")
+            elif page_name == "pre_game":
+                if button == "load_page":
+                    await self.server.pre_game(client_id)
+                else:
+                    print(f"{button} is not valid")
             else:
                 print(f"{page_name} is not valid")

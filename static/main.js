@@ -12,23 +12,11 @@ ws.onmessage = (event) => {
 
   switch (type) {
     case "change_page":
-      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result
-      break;
-
-    case "player_update":
-      update_player(payload);
-      break;
-
-    case "value_update":
-      updatevalue(msg.payload.key, msg.payload.value);
-      break;
-
-    case "player_parameters":
-      display(payload);
+      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result,admin_download
       break;
     
-    case "game_end":
-      showCSVButton();
+    case "ui_update":
+      updateUI(payload);
       break;
 
     default:
@@ -36,32 +24,27 @@ ws.onmessage = (event) => {
   }
 };
 
-function updatevalue(type, newvalue) {
-  const statusEl = document.getElementById(type);
-  if (statusEl) {
-    statusEl.textContent = newvalue;
-  } else {
-    console.warn(`⚠️ Élément #${type} introuvable dans le DOM`);
-  }
-}
+function updateUI(dict) {
+  for (const [id, [text, visible]] of Object.entries(dict)) {
+    const el = document.getElementById(id);
 
-// update player view
-function update_player(p) {
-  p.id != null && (document.getElementById("id").textContent = p.id);
-  p.value != null && (document.getElementById("value").textContent = p.value);
-  p.candidate != null && (document.getElementById("candidate").textContent = p.candidate);
-  p.candidate_id != null && (document.getElementById("candidate_id").textContent = p.candidate_id);
-  p.partner != null && (document.getElementById("partner").textContent = p.partner);
-  p.partner_id != null && (document.getElementById("partner_id").textContent = p.partner_id);
-  p.courtship_timer != null && (document.getElementById("courtship_timer").textContent = p.courtship_timer);
-  p.mating != null && (document.getElementById("mating").textContent = p.mating);
+    if (!el) {
+      console.warn(`⚠️ Element #${id} not found`);
+      continue;
+    }
 
-  if (p.button) {
-    document.getElementById("change").style.display = "none";
-  } else {
-    document.getElementById("change").style.display = "inline-block";
+    // Update the text of the element
+    if (text !== null && text !== undefined) {
+      el.textContent = text;
+    }
+
+    // Update visibility using the .hidden class
+    const row = el.closest('div') || el;  // nearest parent div
+    if (visible !== undefined) {
+      if (visible) row.classList.remove('hidden');
+      else row.classList.add('hidden');
   }
-}
+}}
 
 function button_click(page, button, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -79,48 +62,19 @@ function getPayload(form) {
     const input = item.querySelector("input");
     const toggle = item.querySelector(".toggle");
 
+    // KEY = input.name (always present in your HTML)
     const key = input.name;
 
-    payload[key] = {
-      value: input.value,
-      visible: toggle.dataset.value === "true"
-    };
+    payload[key] = [
+      Number(input.value),             // send numeric value correctly
+      toggle.dataset.value === "true"  // visibility boolean
+    ];
   });
 
   return payload;
 }
 
-// data = { "NbClass": { value: 10, visible: true }, ... }
-function display(data) {
-  const lobbyParameter = ["NbClass", "nb_tours_saison", "TmaxTour", "sigma", "npt_moy_before_mating"]; // must match admin parameter names
 
-  lobbyParameter.forEach(id => {
-    const prm = document.getElementById(id);
-    if (!prm) {
-      console.error(`Paramètre #${id} introuvable dans le DOM !`);
-      return;
-    }
-
-    const span = prm.querySelector("span");
-    if (!span) {
-      console.error(`Élément #${id} ne contient pas de <span>.`);
-      return;
-    }
-
-    if (id in data) {
-      span.textContent = data[id].value;
-
-      // toggle hidden class based on visibility
-      if (data[id].visible) {
-        prm.classList.remove("hidden"); // show
-      } else {
-        prm.classList.add("hidden");    // hide
-      }
-    } else {
-      prm.classList.add("hidden"); // hide if missing
-    }
-  });
-}
 
 // change de page
 async function loadFragment(name) {
@@ -129,15 +83,40 @@ async function loadFragment(name) {
     if (!response.ok) throw new Error("Fragment introuvable");
     const html = await response.text();
     app.innerHTML = html;
-    if (name =="player"){
-      document.getElementById("change").style.display = "none"
-    }
   } catch (err) {
     app.innerHTML = `<p style="color:red;text-align:center;">Erreur de chargement : ${err.message}</p>`;
   }
 }
 
-loadFragment("main_menu");
+async function downloadCSV() {
+    try {
+        const response = await fetch("/download_csv");
+        if (!response.ok) throw new Error("Erreur téléchargement CSV");
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "results.csv";
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        // Switch page AFTER download
+        loadFragment("admin");
+    } catch (err) {
+        console.error("❌ Erreur CSV:", err);
+    }
+}
+
+async function start_game() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ "page": "pre_game", "button": "load_page", "message": null }));
+  } else {
+    console.warn("WebSocket non connecté — action ignorée");
+  }
+}
 
 // ---- Toggle TRUE/FALSE buttons ----
 document.addEventListener("click", (e) => {
@@ -167,32 +146,8 @@ document.addEventListener("click", (e) => {
   }
 });
 
-async function downloadCSV() {
-    try {
-        const response = await fetch("/download_csv");
-        if (!response.ok) throw new Error("Erreur téléchargement CSV");
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "results.csv";
-        a.click();
-
-        URL.revokeObjectURL(url);
-
-        // Switch page AFTER download
-        loadFragment("admin");
-    } catch (err) {
-        console.error("❌ Erreur CSV:", err);
-    }
+async function init() {
+  await loadFragment("main_menu");
+  await start_game(); // now sends message after fragment exists
 }
-
-
-function showCSVButton() {
-    const btn = document.getElementById("download_csv_btn");
-    if (btn) {
-        btn.style.display = "inline-block"; // or "block"
-    }
-}
+init();

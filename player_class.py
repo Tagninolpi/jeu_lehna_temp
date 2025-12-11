@@ -9,24 +9,22 @@ class Player:
         self.partner_id = None #id
         self.courtship_timer = 0
         self.mating = "waiting"
-        self.accept_candidate = False
+        self.accept_candidate = True
 
     def __repr__(self):
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
 
     def player_info(self):
         player_info = {
-                "type": "player_update",
-                "payload": {
-                    "id": self.id,
-                    "value": self.value,
-                    "candidate": self.candidate,
-                    "candidate_id": self.candidate_id,
-                    "partner": self.partner,
-                    "partner_id": self.partner_id,
-                    "courtship_timer": self.courtship_timer,
-                    "mating": self.mating
-                }
+                    "id": (self.id,True),
+                    "value": (self.value,True),
+                    "candidate": (self.candidate,True),
+                    "candidate_id": (self.candidate_id,True),
+                    "partner": (self.partner,True),
+                    "partner_id": (self.partner_id,True),
+                    "courtship_timer": (self.courtship_timer,True),
+                    "mating": (self.mating,True),
+                    "change":(None,self.accept_candidate)
                 }
         return player_info
 

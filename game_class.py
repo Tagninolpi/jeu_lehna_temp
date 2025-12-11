@@ -3,7 +3,7 @@ import math
 import random
 import asyncio
 class Game:
-    def __init__(self,player_value_class_nb:int,nb_round:int,time_to_choose_new_partner:int,sigmoid_sigma:float,sigmoid_turn_to_mate:float):
+    def __init__(self,player_value_class_nb:int,nb_round:int,time_to_choose_new_partner:int,sigmoid_sigma:float,sigmoid_turn_to_mate:float,bot_nb:int):
 
         #Player dict : {id,class}  
         self.all_players = {}
@@ -36,12 +36,15 @@ class Game:
 
         self.game_results = []
 
+        self.bot_nb = bot_nb
+
     def sigmoid_probability(self)->tuple:
         t=0
         L=[round(1/(1+math.exp(self.sigmoid_proba_turn_to_mate*self.sigmoid_proba_sigma)), 3)]
         while L[t]<1:
             L.append(round(1/(1+math.exp(-1*self.sigmoid_proba_sigma*(t-self.sigmoid_proba_turn_to_mate))), self.sigmoid_proba_decimal_nb))
             t+=1
+        #print(L)
         return tuple(L)
 
     def give_all_new_candidate(self):
@@ -72,13 +75,96 @@ class Game:
             rng.shuffle(self.active_players)
             return pair_from_ids(self.active_players)
 
+        # 1. Shuffle once
+        rng.shuffle(self.active_players)
+        current_pairs = pair_from_ids(self.active_players)
+
+        if len(current_pairs) == 1:
+            # Only 2 players left, keep the single pair as is
+            self.previous_pairs = current_pairs.copy()
+            return current_pairs
+
+        # 2. Separate good and bad pairs
+        prev_set = set(self.previous_pairs)
+        good_pairs = []
+        bad_pairs = []
+        for p in current_pairs:
+            if p in prev_set:
+                bad_pairs.append(p)
+            else:
+                good_pairs.append(p)
+        #print(f"good{len(good_pairs)}, bad{len(bad_pairs)}")
+
+        # 3. Fix bad pairs
+        i = 0
+        while i < len(bad_pairs):
+            bad = bad_pairs[i]
+            first_bad = bad[0]
+
+            if good_pairs:
+                # Swap with a random good pair as before
+                idx = random.randrange(len(good_pairs))
+                first_good, second_good = good_pairs[idx]
+
+                # Swap first elements
+                new_good_pair = (first_bad, second_good)
+                new_bad_pair = (first_good, bad[1])
+
+                # Replace the chosen good pair with the new one
+                good_pairs[idx] = new_good_pair
+                # Add the fixed bad pair to good_pairs
+                good_pairs.append(new_bad_pair)
+                i += 1
+            else:
+                # No good pairs, swap with the next bad pair (if exists)
+                if i + 1 < len(bad_pairs):
+                    next_bad = bad_pairs[i + 1]
+                    first_next_bad, second_next_bad = next_bad
+
+                    # Swap first elements
+                    new_pair_1 = (first_bad, second_next_bad)
+                    new_pair_2 = (first_next_bad, bad[1])
+
+                    # Remove the next bad pair and add both fixed pairs to good_pairs
+                    bad_pairs.pop(i + 1)
+                    good_pairs.extend([new_pair_1, new_pair_2])
+                    i += 1  # Skip current as it's now handled
+                else:
+                    # Last bad pair, nothing to swap with, keep as-is
+                    good_pairs.append(bad)
+                    i += 1
+
+        # 4. Result
+        current_pairs = good_pairs
+
+        # Optional check
+        assert all(p not in prev_set for p in current_pairs), "Some pairs still overlap!"
+
+        # Update previous pairs
+        self.previous_pairs = current_pairs.copy()
+        return current_pairs
+
+
+        
+
+    """ 
+    def encounter(self):
+        rng = np.random.default_rng()
+
+        def pair_from_ids(lst: list[str]):
+            return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
+
+        if not self.previous_pairs:
+            rng.shuffle(self.active_players)
+            return pair_from_ids(self.active_players)
+
         avoid_norm = {tuple(sorted(x)) for x in self.previous_pairs}
         for _ in range(20): 
             rng.shuffle(self.active_players)
             pairs = pair_from_ids(self.active_players)
             if all(tuple(sorted(p)) not in avoid_norm for p in pairs):
                 return pairs
-        return pair_from_ids(self.active_players)
+        return pair_from_ids(self.active_players) """
     
     def after_choose(self):
         # list de tous les ids de joueurs qui veulent changer = changing_players
@@ -91,7 +177,7 @@ class Game:
             if candidate_id in self.changing_players:
                 me.partner = me.candidate
                 me.partner_id = me.candidate_id
-                me.courtship_timer = "c"
+                me.courtship_timer = -999999
             else:# sinon je ne peux pas changer enlevé de la list pour changer
                 remove.append(id)
         for id in remove:
@@ -102,13 +188,13 @@ class Game:
             partner_id = me.partner_id
             # mon partenaire change mais pas moi
             if partner_id in self.changing_players and not(me.id in self.changing_players):
-                me.partner = None
-                me.partner_id = None
+                me.partner = -1
+                me.partner_id = 0
                 me.courtship_timer = -1
             else:
                 # rien ne change
                 #je devien courtship    
-                if me.courtship_timer == "c":
+                if me.courtship_timer == -999999:
                     me.courtship_timer = 1
                     #je suis celib 
                 elif me.courtship_timer <= 0:
@@ -118,6 +204,7 @@ class Game:
                     me.courtship_timer += 1
                 
     def tryToMate(self)->bool:
+        print(f"activeplayer {len(self.active_players)}")
         pairs = []
         for id in self.active_players:
             if self.all_players[id].partner_id:
@@ -132,8 +219,13 @@ class Game:
             if me.partner_id:
                 if courtship_time >0 and me.mating != "mate":
                     proba =random.random()
-                    mate_threachold = self.sigmoid_proba[courtship_time]
-                    if proba < mate_threachold:
+                    #print(courtship_time)
+                    if courtship_time < len(self.sigmoid_proba):
+                        mate_threachold = self.sigmoid_proba[courtship_time]
+                    else:
+                        mate_threachold = 1.3 
+                     
+                    if proba < mate_threachold:                            
                         self.mating_players.append(me.id)
                         self.mating_players.append(partner.id)
                         self.active_players.remove(me.id)
@@ -142,13 +234,11 @@ class Game:
                         partner.mating = "mate"
                         me.courtship_timer = 0
                         partner.courtship_timer = 0
-                        return me.id,partner.id
-        return 0,0
-                    
+
     def end_turn_clean_up(self):
         self.changing_players.clear()
         self.round += 1
-        print(self.round)
+        print(f"round{self.round}")
         for id,player in self.all_players.items():
             if player.mating != "mate":
                 player.mating = "waiting"
