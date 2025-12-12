@@ -210,7 +210,7 @@ class Server:
             await self.connections.change_page(self.admin_id, "admin_download")
             self.admin_page = "admin_download"
             await self.connections.change_page(self.connections.lobby[0],"player_result")
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.5)
             await self.send_game_results()
         # Reset lobby state
         self.lobby_state = "closed"
