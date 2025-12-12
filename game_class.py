@@ -35,8 +35,21 @@ class Game:
         self.sigmoid_proba = self.sigmoid_probability()
 
         self.game_results = []
-
+        self.last_chance_option = False
         self.bot_nb = bot_nb
+
+        self.admin_overview = {
+            "bias_pos_step":[0,True],
+            "bias_neg_step":[0,True],
+            "players_courtship":[0,True],
+            "players_mate":[0,True],
+            "players_single":[0,True],
+            "players_total":[0, True],
+            "bias_pos_total":[0,True],
+            "bias_neg_total":[0,True],
+            "steps_remaining":[0,True]
+            }
+
 
     def sigmoid_probability(self)->tuple:
         t=0
@@ -188,8 +201,8 @@ class Game:
             partner_id = me.partner_id
             # mon partenaire change mais pas moi
             if partner_id in self.changing_players and not(me.id in self.changing_players):
-                me.partner = -1
-                me.partner_id = 0
+                me.partner = 0
+                me.partner_id = "0"
                 me.courtship_timer = -1
             else:
                 # rien ne change
@@ -214,9 +227,9 @@ class Game:
                     pairs.append((id,self.all_players[id].partner_id))
         for pair in pairs:
             me = self.all_players[pair[0]]
-            partner = self.all_players[pair[1]]
             courtship_time = me.courtship_timer
-            if me.partner_id:
+            if me.partner_id != "0":
+                partner = self.all_players[pair[1]]
                 if courtship_time >0 and me.mating != "mate":
                     proba =random.random()
                     #print(courtship_time)

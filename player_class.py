@@ -3,10 +3,10 @@ class Player:
     def __init__(self, class_nb: float, ID: str):
         self.id = ID
         self.value = self.set_value(class_nb)
-        self.candidate = None #value
-        self.candidate_id = None #id
-        self.partner = None #value
-        self.partner_id = None #id
+        self.candidate = 0 #value
+        self.candidate_id = "0" #id
+        self.partner = 0 #value
+        self.partner_id = "0" #id
         self.courtship_timer = 0
         self.mating = "waiting"
         self.accept_candidate = True
@@ -14,16 +14,16 @@ class Player:
     def __repr__(self):
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
 
-    def player_info(self):
+    def player_info(self,visibility_dict):
         player_info = {
-                    "id": (self.id,True),
-                    "value": (self.value,True),
-                    "candidate": (self.candidate,True),
-                    "candidate_id": (self.candidate_id,True),
-                    "partner": (self.partner,True),
-                    "partner_id": (self.partner_id,True),
-                    "courtship_timer": (self.courtship_timer,True),
-                    "mating": (self.mating,True),
+                    "id": (self.id,visibility_dict["id"]),
+                    "value": (self.value,visibility_dict["value"]),
+                    "candidate": (self.candidate,visibility_dict["candidate"]),
+                    "candidate_id": (self.candidate_id,visibility_dict["candidate_id"]),
+                    "partner": (self.partner,visibility_dict["partner"]),
+                    "partner_id": (self.partner_id,visibility_dict["partner_id"]),
+                    "courtship_timer": (self.courtship_timer,visibility_dict["courtship_timer"]),
+                    "mating": (self.mating,visibility_dict["mating"]),
                     "change":(None,self.accept_candidate)
                 }
         return player_info

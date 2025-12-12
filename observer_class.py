@@ -29,13 +29,22 @@ class Observer:
                     print(f"{button} is not valid")
             elif page_name == "player":
                 if button == "change_partner":
-                    print("funcchange")
                     await self.server.player_change_partner(client_id)
+                else:
+                    print(f"{button} is not valid")
+            elif page_name == "player_lobby":
+                if button == "leave":
+                    await self.server.leave_lobby(client_id)
                 else:
                     print(f"{button} is not valid")
             elif page_name == "admin_result":
                 if button == "reset_game":
                     await self.server.reset_all(True)
+                else:
+                    print(f"{button} is not valid")
+            elif page_name == "player_result":
+                if button == "leave_game":
+                    await self.server.leave_game(client_id)
                 else:
                     print(f"{button} is not valid")
             elif page_name == "pre_game":

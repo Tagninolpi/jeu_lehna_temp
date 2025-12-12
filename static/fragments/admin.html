@@ -11,15 +11,15 @@
 
   <!-- npt_saison -->
   <div class="param-item">
-    <label>Nombre de tours dans une saison</label>
-    <input type="number" name="nb_tours_saison" value="25" required>
+    <label>Nombre de pas de temps dans une saison</label>
+    <input type="number" name="nb_tours_saison" value="5" required>
     <button type="button" class="toggle" data-name="npt_saison" data-value="false">Invisible</button>
   </div>
 
   <!-- TmaxTour -->
   <div class="param-item">
-    <label>Nombre de pas de temps que le joueur a pour choisir son nouveau partenaire</label>
-    <input type="number" name="TmaxTour" value="1" required>
+    <label>Nombre de secondes que le joueur a pour choisir son nouveau partenaire</label>
+    <input type="number" name="TmaxTour" value="0" required>
     <button type="button" class="toggle" data-name="TmaxTour" data-value="false">Invisible</button>
   </div>
 
@@ -40,14 +40,128 @@
   <!-- nb_bots -->
   <div class="param-item">
     <label>Nombre de bots</label>
-    <input type="number" name="nb_bots" value="50" required>
+    <input type="number" name="nb_bots" value="20" required>
     <button type="button" class="toggle" data-name="nb_bots" data-value="false">Invisible</button>
   </div>
 
+  <!-- last chance -->
+  <div class="param-item">
+    <label>Last Chance Option</label>
+    <button type="button" class="value-toggle" data-name="last_chance" data-value="false">Disabled</button>
+    <button type="button" class="toggle" data-value="false">Invisible</button>
+  </div>
 
   <button type="button"
           onclick="button_click('admin_para','create_lobby', getPayload(this.form))">
     Lancer le lobby
   </button>
+
+  <!--données joueurs visible-->
+  <h2>Visibilité des données joueurs</h2>
+
+  <div class="param-item">
+    <label>My ID</label>
+    <button type="button" class="toggle" data-name="id" data-value="false">Invisible</button>
+  </div>
+
+  <div class="param-item">
+    <label>My Value</label>
+    <button type="button" class="toggle" data-name="value" data-value="true">Visible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Current Partner</label>
+    <button type="button" class="toggle" data-name="partner" data-value="true">Visible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Partner ID</label>
+    <button type="button" class="toggle" data-name="partner_id" data-value="false">Invisible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Candidate</label>
+    <button type="button" class="toggle" data-name="candidate" data-value="true">Visible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Candidate ID</label>
+    <button type="button" class="toggle" data-name="candidate_id" data-value="false">Invisible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Courtship Timer</label>
+    <button type="button" class="toggle" data-name="courtship_timer" data-value="true">Visible</button>
+  </div>
+
+  <div class="param-item">
+    <label>Mating</label>
+    <button type="button" class="toggle" data-name="mating" data-value="true">Visible</button>
+  </div>
+
+  <h2>Visibilité des résultats des joueurs</h2>
+
+  <div class="param-item">
+    <label>Valeur du partenaire obtenu</label>
+    <button type="button" class="toggle" data-name="valeur_du_partenaire_obtenu" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Nombre de joueurs qui ont ma valeur</label>
+    <button type="button" class="toggle" data-name="nombre_de_joueurs_dans_ma_class" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Valeur moyenne du partenaire (même classe)</label>
+    <button type="button" class="toggle" data-name="moyenne_valeur_partenaire_meme_classe" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Pourcentage de ma classe qui n'a pas de partenaire</label>
+    <button type="button" class="toggle" data-name="pourcentage_classe_ayant_partenaire" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Nombre de pas de temps avant d'obtenir un partenaire</label>
+    <button type="button" class="toggle" data-name="temps_pour_obtenir_partenaire" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Ma valeur</label>
+    <button type="button" class="toggle" data-name="nombre_de_rencontres" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Nombre de refus</label>
+    <button type="button" class="toggle" data-name="nombre_de_refus" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Nombre d'acceptations</label>
+    <button type="button" class="toggle" data-name="nombre_d_acceptations" data-value="true">
+      Visible
+    </button>
+  </div>
+
+  <div class="param-item">
+    <label>Rang dans ma classe (selon valeur du partenaire obtenu)</label>
+    <button type="button" class="toggle" data-name="rang_dans_sa_classe" data-value="true">
+      Visible
+    </button>
+  </div>
 
 </form>

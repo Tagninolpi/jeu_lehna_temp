@@ -12,7 +12,7 @@ ws.onmessage = (event) => {
 
   switch (type) {
     case "change_page":
-      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result,admin_download
+      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result,admin_download,player_result
       break;
     
     case "ui_update":
@@ -54,25 +54,41 @@ function button_click(page, button, payload) {
   }
 }
 
-// reads all form fields and builds a payload object
 function getPayload(form) {
   const payload = {};
 
   form.querySelectorAll(".param-item").forEach(item => {
     const input = item.querySelector("input");
     const toggle = item.querySelector(".toggle");
+    const valueBtn = item.querySelector(".value-toggle"); // our new value button
 
-    // KEY = input.name (always present in your HTML)
-    const key = input.name;
+    if (input) {
+      // Numeric parameter + visibility
+      const key = input.name;
+      const value = [ Number(input.value), toggle.dataset.value === "true" ];
+      payload[key] = value;
+    } else if (valueBtn) {
+      // Last Chance (or any value-only button) + associated visibility button
+      const key = valueBtn.dataset.name;
+      const value = valueBtn.dataset.value === "true";
 
-    payload[key] = [
-      Number(input.value),             // send numeric value correctly
-      toggle.dataset.value === "true"  // visibility boolean
-    ];
+      const visibleBtn = item.querySelector(".toggle"); // visibility button
+      const visible = visibleBtn ? visibleBtn.dataset.value === "true" : false;
+
+      payload[key] = [value, visible];
+    } else if (toggle) {
+      // Visibility-only parameter
+      const key = toggle.dataset.name;
+      const visible = toggle.dataset.value === "true";
+      payload[key] = [0, visible];
+    }
   });
 
   return payload;
 }
+
+
+
 
 
 
@@ -96,9 +112,16 @@ async function downloadCSV() {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
 
+        // Get filename from Content-Disposition header
+        let fileName = "results.csv"; // default
+        const disposition = response.headers.get("Content-Disposition");
+        if (disposition && disposition.includes("filename=")) {
+            fileName = disposition.split("filename=")[1].replace(/['"]/g, '');
+        }
+
         const a = document.createElement("a");
         a.href = url;
-        a.download = "results.csv";
+        a.download = fileName; // use dynamic filename
         a.click();
 
         URL.revokeObjectURL(url);
@@ -110,6 +133,7 @@ async function downloadCSV() {
     }
 }
 
+
 async function start_game() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ "page": "pre_game", "button": "load_page", "message": null }));
@@ -120,31 +144,25 @@ async function start_game() {
 
 // ---- Toggle TRUE/FALSE buttons ----
 document.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("toggle")) return;
-
   const btn = e.target;
+  if (!btn.classList.contains("toggle") && !btn.classList.contains("value-toggle")) return;
 
-  // read current state
   let value = btn.dataset.value === "true";
-
-  // toggle it
   value = !value;
-
-  // save it
   btn.dataset.value = value;
 
-  // update text
-  btn.textContent = value ? "Visible" : "Invisible";
-
-  // update visual color
-  if (value) {
-    btn.style.background = "white";
-    btn.style.color = "black";
+  // Update text based on type
+  if (btn.classList.contains("value-toggle")) {
+    btn.textContent = value ? "Enabled" : "Disabled";
   } else {
-    btn.style.background = "black";
-    btn.style.color = "white";
+    btn.textContent = value ? "Visible" : "Invisible";
   }
+
+  // Optional styling
+  btn.style.background = value ? "white" : "black";
+  btn.style.color = value ? "black" : "white";
 });
+
 
 async function init() {
   await loadFragment("main_menu");

@@ -48,15 +48,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/download_csv")
 async def download_csv():
-    csv_file = server.get_game_result()
+    csv_file, file_name = server.get_game_result()
 
-    # No CSV available? → Tell the browser "nothing to download"
+    # No CSV available
     if not csv_file:
         return {"available": False}
 
-    # CSV exists → return file
+    # Return CSV to browser
     return StreamingResponse(
         csv_file,
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=game_results.csv"}
+        headers={"Content-Disposition": f"attachment; filename={file_name}"}
     )
