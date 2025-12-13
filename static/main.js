@@ -5,7 +5,6 @@ const wsHost = window.location.host;
 const app = document.getElementById("app");
 let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`);
 
-// ---- Incoming messages ----
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
   const { type, payload } = msg;
@@ -25,14 +24,22 @@ ws.onmessage = (event) => {
 };
 
 function updateUI(dict) {
-  for (const [id, [text, visible]] of Object.entries(dict)) {
-        if (id === "change") continue;
+    for (const [id, [text, visible]] of Object.entries(dict)) {
+
+      if (id === "change") {
         const el = document.getElementById(id);
-        
-        if (!el) {
-          console.warn(`⚠️ Element #${id} not found`);
-          continue;
+        if (!el) continue;
+
+        if (visible !== undefined) {
+          const row = el.closest('div') || el;
+          if (visible) row.classList.remove('hidden');
+          else row.classList.add('hidden');
         }
+        continue;
+      }
+
+      const el = document.getElementById(id);
+      if (!el) continue;
 
     // Update the text of the element
     if (id === "status") {
@@ -55,16 +62,22 @@ function updateUI(dict) {
       }
 
       } else {
-        if (el.textContent !== String(text)) {
-          scrambleText(el, String(text));
+        // Sécurité anti-null / anti-"null"
+        const safeText =
+          text === null || text === "null" || text === undefined
+            ? ""
+            : String(text);
 
-          el.classList.add("pixel-text");
-          setTimeout(() => el.classList.remove("pixel-text"), 500);
+        if (el.textContent !== safeText) {
+          el.textContent = safeText;
+
+          // Animation UNIQUEMENT si on a du vrai texte
+          if (safeText !== "") {
+            el.classList.add("pixel-text");
+            setTimeout(() => el.classList.remove("pixel-text"), 500);
+          }
         }
       }
-
-
-
 
     const row = el.closest('div') || el;
     if (visible !== undefined) {
@@ -74,14 +87,6 @@ function updateUI(dict) {
 }}
 
 function button_click(page, button, payload) {
-
-  if (page === "player" && button === "change_partner") {
-    const btn = document.getElementById("change");
-    if (btn) {
-      btn.classList.add("hidden");
-    }
-  }
-
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({
       page: page,
