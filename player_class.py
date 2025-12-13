@@ -15,17 +15,21 @@ class Player:
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
 
     def player_info(self,visibility_dict):
+        change = self.accept_candidate
+        if self.candidate_id == self.partner_id:
+            change = False
         player_info = {
-                    "id": (self.id,visibility_dict["id"]),
-                    "value": (self.value,visibility_dict["value"]),
-                    "candidate": (self.candidate,visibility_dict["candidate"]),
-                    "candidate_id": (self.candidate_id,visibility_dict["candidate_id"]),
-                    "partner": (self.partner,visibility_dict["partner"]),
-                    "partner_id": (self.partner_id,visibility_dict["partner_id"]),
-                    "courtship_timer": (self.courtship_timer,visibility_dict["courtship_timer"]),
-                    "mating": (self.mating,visibility_dict["mating"]),
-                    "change":(None,self.accept_candidate)
+                    "id": (self.id,visibility_dict["id"][1]),
+                    "value": (self.value,visibility_dict["value"][1]),
+                    "candidate": (self.candidate,visibility_dict["candidate"][1]),
+                    "candidate_id": (self.candidate_id,visibility_dict["candidate_id"][1]),
+                    "partner": (self.partner,visibility_dict["partner"][1]),
+                    "partner_id": (self.partner_id,visibility_dict["partner_id"][1]),
+                    "courtship_timer": (self.courtship_timer,visibility_dict["courtship_timer"][1]),
+                    "mating": (self.mating,visibility_dict["mating"][1]),
+                    "change":(None,change)
                 }
+
         return player_info
 
     def build_class_thresholds(self,nb_classes: int) -> list[tuple[int, float]]:
