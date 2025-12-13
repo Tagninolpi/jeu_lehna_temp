@@ -4,6 +4,14 @@ const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
 const wsHost = window.location.host;
 const app = document.getElementById("app");
 let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`);
+// TIC TAC TIMER
+const ticTacSound = new Audio("/static/sounds/tictac.mp3");
+ticTacSound.loop = true;
+ticTacSound.volume = 0.5;
+
+let ticTacPlaying = false;
+let audioUnlocked = false;
+
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
@@ -24,28 +32,26 @@ ws.onmessage = (event) => {
 };
 
 function updateUI(dict) {
-    for (const [id, [text, visible]] of Object.entries(dict)) {
+  for (const [id, [text, visible]] of Object.entries(dict)) {
 
-      if (id === "change") {
-        const el = document.getElementById(id);
-        if (!el) continue;
-
-        if (visible !== undefined) {
-          const row = el.closest('div') || el;
-          if (visible) row.classList.remove('hidden');
-          else row.classList.add('hidden');
-        }
-        continue;
-      }
-
+    if (id === "change") {
       const el = document.getElementById(id);
       if (!el) continue;
 
-    // Update the text of the element
+      if (visible !== undefined) {
+        const row = el.closest('div') || el;
+        if (visible) row.classList.remove('hidden');
+        else row.classList.add('hidden');
+      }
+      continue;
+    }
+
+    const el = document.getElementById(id);
+    if (!el) continue;
+
     if (id === "status") {
       el.textContent = text;
 
-      // Try to extract remaining seconds
       const match = text.match(/(\d+)\s*seconds?/);
 
       if (match) {
@@ -53,38 +59,57 @@ function updateUI(dict) {
 
         if (seconds <= 10) {
           el.classList.add("timer-urgent");
+
+          if (audioUnlocked && !ticTacPlaying) {
+            ticTacSound.currentTime = 0;
+            ticTacSound.play().catch(() => {});
+            ticTacPlaying = true;
+          }
+
         } else {
           el.classList.remove("timer-urgent");
-        }
-      } else {
-        // Not a timer anymore (mate / waiting)
-        el.classList.remove("timer-urgent");
-      }
 
-      } else {
-        // Sécurité anti-null / anti-"null"
-        const safeText =
-          text === null || text === "null" || text === undefined
-            ? ""
-            : String(text);
-
-        if (el.textContent !== safeText) {
-          el.textContent = safeText;
-
-          // Animation UNIQUEMENT si on a du vrai texte
-          if (safeText !== "") {
-            el.classList.add("pixel-text");
-            setTimeout(() => el.classList.remove("pixel-text"), 500);
+          if (ticTacPlaying) {
+            ticTacSound.pause();
+            ticTacSound.currentTime = 0;
+            ticTacPlaying = false;
           }
         }
+
+      } else {
+        el.classList.remove("timer-urgent");
+
+        if (ticTacPlaying) {
+          ticTacSound.pause();
+          ticTacSound.currentTime = 0;
+          ticTacPlaying = false;
+        }
       }
+
+    } else {
+      const safeText =
+        text === null || text === "null" || text === undefined
+          ? ""
+          : String(text);
+
+      if (el.textContent !== safeText) {
+        el.textContent = safeText;
+
+        if (safeText !== "") {
+          el.classList.add("pixel-text");
+          setTimeout(() => el.classList.remove("pixel-text"), 500);
+        }
+      }
+    }
 
     const row = el.closest('div') || el;
     if (visible !== undefined) {
       if (visible) row.classList.remove('hidden');
       else row.classList.add('hidden');
+    }
   }
-}}
+}
+
 
 function button_click(page, button, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -236,6 +261,18 @@ function scrambleText(el, newText) {
     }
   }, duration / steps);
 }
+
+
+document.addEventListener("click", () => {
+  if (!audioUnlocked) {
+    ticTacSound.play().then(() => {
+      ticTacSound.pause();
+      ticTacSound.currentTime = 0;
+      audioUnlocked = true;
+      console.log("🔊 Audio débloqué");
+    }).catch(() => {});
+  }
+}, { once: true });
 
 init();
 
