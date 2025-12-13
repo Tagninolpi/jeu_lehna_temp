@@ -23,7 +23,7 @@ class Server:
         self.parameters = {}
 
     async def pre_game(self,client_id):
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(1)
         await self.connections.update_value_all(client_id,{"lobby_status":(self.lobby_state,True)})
 
     # on client message recieve 
@@ -31,7 +31,7 @@ class Server:
         if self.lobby_state == "opened":
             self.connections.lobby[0].append(client_id)
             await self.connections.change_page(client_id,"player_lobby")
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(1)
             await self.connections.update_value_all(self.connections.websockets,{"players_connected":(f"Joueurs connectés : {len(self.connections.lobby.get(0, []))}",True)})
 
             
@@ -50,7 +50,7 @@ class Server:
             #print("is admin")
 
     async def create_lobby(self,client_id,parameters):
-        #print(f"parameters{parameters}")
+        print(f"parameters{parameters}")
         self.lobby_state = "opened"
         await self.connections.update_value_all(self.connections.websockets,{"lobby_status":(self.lobby_state,True)})
         #print(self.lobby_state)
@@ -99,7 +99,7 @@ class Server:
             self.ev_players_choose_finish.clear()
             self.connections.game.changing_players.clear()
             self.connections.game.give_all_new_candidate()
-            for id in self.connections.game.active_players:
+            for id in self.connections.lobby[0]:
                 await self.connections.update_value_all(id,self.connections.game.all_players[id].player_info(self.connections.game.parameters))
             self.timer = asyncio.create_task(self.start_timer(self.connections.game.choose_time))
             await self.ev_players_choose_finish.wait()
@@ -181,13 +181,15 @@ class Server:
                     "partner_id":player.partner_id,
                     "candidate_value":player.candidate,
                     "candidate_id":player.candidate_id,
-                    "accept_candidate":(True if not(player.accept_candidate)else False),
+                    "accept_candidate":(False if player.accept_candidate else True),
                     "courtship_timer":0 if (last and player.courtship_timer >= 0) else player.courtship_timer,
                     "pas de temps":self.connections.game.round}
             #print(line)
             self.connections.game.game_results.append(line)
             if player.mating != "mate":
                 player.accept_candidate = True
+            else:
+                player.accept_candidate = False
     
     async def reset_all(self,all=False):
         # Cancel the timer if running
@@ -204,13 +206,13 @@ class Server:
             await self.connections.change_page(self.admin_id, "admin")
             self.game_results = []
             await self.connections.change_page(self.connections.lobby[0],"main_menu")
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(1)
             await self.connections.update_value_all(None,{"lobby_status":(self.lobby_state,True)})
         else:
             await self.connections.change_page(self.admin_id, "admin_download")
             self.admin_page = "admin_download"
             await self.connections.change_page(self.connections.lobby[0],"player_result")
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(2.5)
             await self.send_game_results()
         # Reset lobby state
         self.lobby_state = "closed"
@@ -343,7 +345,7 @@ class Server:
     async def leave_lobby(self,client_id):
         self.connections.lobby[0].remove(client_id)
         await self.connections.change_page(client_id,"main_menu")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(1)
         await self.connections.update_value_all(self.connections.websockets,{"players_connected":(f"Joueurs connectés : {len(self.connections.lobby.get(0, []))}",True)})
 
     async def leave_game(self,client_id):
