@@ -121,7 +121,7 @@ class Server:
         for i in range(time):
             await asyncio.sleep(1)
             #print(i)
-            await self.connections.update_value_all(set(self.connections.lobby.get(0, [])),{"status":(f"time remaining : {time-i} seconds",True)})
+            await self.connections.update_value_all(set(self.connections.lobby.get(0, [])),{"status":(f"Time remaining : {time-i} seconds",True)})
         self.connections.game.game_status = "choose_finish"
         self.ev_players_choose_finish.set()
 

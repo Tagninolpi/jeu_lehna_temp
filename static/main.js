@@ -26,17 +26,45 @@ ws.onmessage = (event) => {
 
 function updateUI(dict) {
   for (const [id, [text, visible]] of Object.entries(dict)) {
-    const el = document.getElementById(id);
-
-    if (!el) {
-      console.warn(`⚠️ Element #${id} not found`);
-      continue;
-    }
+        if (id === "change") continue;
+        const el = document.getElementById(id);
+        
+        if (!el) {
+          console.warn(`⚠️ Element #${id} not found`);
+          continue;
+        }
 
     // Update the text of the element
-    if (text !== null && text !== undefined) {
+    if (id === "status") {
       el.textContent = text;
-    }
+
+      // Try to extract remaining seconds
+      const match = text.match(/(\d+)\s*seconds?/);
+
+      if (match) {
+        const seconds = parseInt(match[1], 10);
+
+        if (seconds <= 10) {
+          el.classList.add("timer-urgent");
+        } else {
+          el.classList.remove("timer-urgent");
+        }
+      } else {
+        // Not a timer anymore (mate / waiting)
+        el.classList.remove("timer-urgent");
+      }
+
+      } else {
+        if (el.textContent !== String(text)) {
+          scrambleText(el, String(text));
+
+          el.classList.add("pixel-text");
+          setTimeout(() => el.classList.remove("pixel-text"), 500);
+        }
+      }
+
+
+
 
     // Update visibility using the .hidden class
     const row = el.closest('div') || el;  // nearest parent div
@@ -86,10 +114,6 @@ function getPayload(form) {
 
   return payload;
 }
-
-
-
-
 
 
 // change de page
@@ -168,4 +192,33 @@ async function init() {
   await loadFragment("main_menu");
   await start_game(); // now sends message after fragment exists
 }
+
+function scrambleText(el, newText) {
+  const chars = "!<>-_\\/[]{}—=+*^?#________";
+  const duration = 600;
+  const steps = 20;
+  let frame = 0;
+  const oldText = el.textContent;
+
+  const interval = setInterval(() => {
+    let output = "";
+    for (let i = 0; i < newText.length; i++) {
+      if (i < (frame / steps) * newText.length) {
+        output += newText[i];
+      } else {
+        output += chars[Math.floor(Math.random() * chars.length)];
+      }
+    }
+
+    el.textContent = output;
+    frame++;
+
+    if (frame >= steps) {
+      clearInterval(interval);
+      el.textContent = newText;
+    }
+  }, duration / steps);
+}
+
 init();
+
