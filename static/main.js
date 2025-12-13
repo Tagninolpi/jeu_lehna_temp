@@ -92,13 +92,10 @@ function updateUI(dict) {
           ? ""
           : String(text);
 
-      if (el.textContent !== safeText) {
+      if (el.textContent !== safeText && safeText !== "") {
+        scrambleText(el, safeText);
+      } else {
         el.textContent = safeText;
-
-        if (safeText !== "") {
-          el.classList.add("pixel-text");
-          setTimeout(() => el.classList.remove("pixel-text"), 500);
-        }
       }
     }
 
