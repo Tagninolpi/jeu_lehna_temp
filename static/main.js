@@ -92,10 +92,14 @@ function updateUI(dict) {
           ? ""
           : String(text);
 
-      if (el.textContent !== safeText && safeText !== "") {
-        scrambleText(el, safeText);
-      } else {
+      if (id === "candidate") {
         el.textContent = safeText;
+      } else {
+        if (el.textContent !== safeText && safeText !== "") {
+          scrambleText(el, safeText);
+        } else {
+          el.textContent = safeText;
+        }
       }
     }
 
