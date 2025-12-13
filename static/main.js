@@ -66,8 +66,7 @@ function updateUI(dict) {
 
 
 
-    // Update visibility using the .hidden class
-    const row = el.closest('div') || el;  // nearest parent div
+    const row = el.closest('div') || el;
     if (visible !== undefined) {
       if (visible) row.classList.remove('hidden');
       else row.classList.add('hidden');
@@ -75,12 +74,25 @@ function updateUI(dict) {
 }}
 
 function button_click(page, button, payload) {
+
+  if (page === "player" && button === "change_partner") {
+    const btn = document.getElementById("change");
+    if (btn) {
+      btn.classList.add("hidden");
+    }
+  }
+
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ "page": page, "button": button, "message": payload }));
+    ws.send(JSON.stringify({
+      page: page,
+      button: button,
+      message: payload
+    }));
   } else {
     console.warn("WebSocket non connecté — action ignorée");
   }
 }
+
 
 function getPayload(form) {
   const payload = {};
