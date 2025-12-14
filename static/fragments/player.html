@@ -1,4 +1,24 @@
+<!-- Fragment HTML affichant l'inteface de jeu du joueur -->
+
 <h1>Partner Interface</h1>
+
+<!--
+Interface joueur
+
+Structure :
+- player-layout : conteneur principal de l’interface joueur
+- player-main : zone affichant les informations du joueur et les paramètres de la partie
+- player-candidate : zone affichant le candidat actuellement proposé
+- hud / tile : affichage des états temps réel (statut du tour, état du mating)
+- card : bloc visuel regroupant une information joueur (ID, valeur, partenaire)
+
+Données :
+- Tous les éléments possédant un id (status, value, partner, candidate, etc.) sont mis à jour dynamiquement depuis le backend.
+- Les mises à jour sont reçues via WebSocket et traitées dans main.js,
+  fonction updateUI(), qui injecte les valeurs dans les éléments correspondants.
+
+Ces classes sont utilisées uniquement pour la mise en page (CSS).
+-->
 
 <div class="player-layout">
   <div class="player-main">
@@ -69,7 +89,6 @@
 
     <div class="candidate-title">Candidate</div>
     <div class="candidate-value" id="candidate">--</div>
-
 
     <div>
       <strong>Candidate ID:</strong> 

@@ -1,12 +1,11 @@
+<!-- Fragment HTML du menu principal permettant de choisir le mode de jeu (Player ou Admin) -->
+
 <div class="center">
   <h1>Bienvenue dans le jeu LEHNA</h1>
   <p>Choisissez votre mode :</p>
-
   <div style="margin-top:20px;">
-    <button onclick="button_click('main_menu', 'player',null)">Mode Joueur</button>
-    <button onclick="button_click('main_menu', 'admin','password')">Mode Admin</button>
+    <button onclick="button_click('main_menu', 'player',null)">Mode Joueur</button> <!-- Accès au mode joueur -->
+    <button onclick="button_click('main_menu', 'admin','password')">Mode Admin</button> <!-- Accès au mode administrateur -->
   </div>
-
-  <div><strong>Game Status:</strong> <span id="lobby_status">Lobby closed</span></div>
-
+  <div><strong>Game Status:</strong> <span id="lobby_status">Lobby closed</span></div> <!-- Affiche l'état actuel du lobby -->
 </div>

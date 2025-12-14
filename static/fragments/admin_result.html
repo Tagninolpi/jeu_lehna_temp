@@ -1,9 +1,13 @@
+<!-- Fragment HTML pour l'affichage global de l'état de la partie et des statistiques pour l'administrateur -->
+
 <h1>Game Overview</h1>
-<button onclick="button_click('admin_result','reset_game',null)">Reset Game</button>
+<button onclick="button_click('admin_result','reset_game',null)">Reset Game</button> <!-- Bouton permettant de réinitialiser la partie -->
 
-<h1>Statistiques</h1>
+<h1>Statistiques</h1> 
 
-<div><strong>Nombre de biais positifs (pas de temps précédent) :</strong> <span id="bias_pos_step">0</span></div>
+<!-- Affichages des données en fonction du paramètrage de la partie -->
+
+<div><strong>Nombre de biais positifs (pas de temps précédent) :</strong> <span id="bias_pos_step">0</span></div> 
 <div><strong>Nombre de biais négatifs (pas de temps précédent) :</strong> <span id="bias_neg_step">0</span></div>
 
 <div><strong>Nombre de joueurs en courtship :</strong> <span id="players_courtship">0</span></div>

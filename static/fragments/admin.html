@@ -1,101 +1,114 @@
+<!-- Fragment HTML pour le paramétrage du lobby avant le lancement de la partie -->
+
 <h1>Paramétrage du lobby</h1>
 
+<!-- Chaque .param-item correspond à un paramètre du lobby récupéré par getPayload() dans main.js et envoyé au backend lors de la création du lobby -->
 <form id="game_parameters">
 
-  <!-- NbClass -->
+  <!-- Nombre de classes -->
   <div class="param-item">
     <label>Nombre de classes (NbClass)</label>
     <input type="number" name="NbClass" value="10" required>
-    <button type="button" class="toggle" data-name="NbClass" data-value="false">Invisible</button>
+    <button type="button" class="toggle" data-name="NbClass" data-value="false">Invisible</button> <!--  Bouton de controle de la visibilité du paramètre -->
   </div>
 
-  <!-- npt_saison -->
+  <!-- Nombre de pas de temps par saison -->
   <div class="param-item">
     <label>Nombre de pas de temps dans une saison</label>
     <input type="number" name="nb_tours_saison" value="20" required>
     <button type="button" class="toggle" data-name="npt_saison" data-value="false">Invisible</button>
   </div>
 
-  <!-- TmaxTour -->
+  <!-- Temps maximum pour choisir un partenaire -->
   <div class="param-item">
     <label>Nombre de secondes que le joueur a pour choisir son nouveau partenaire</label>
     <input type="number" name="TmaxTour" value="25" required>
     <button type="button" class="toggle" data-name="TmaxTour" data-value="true">Visible</button>
   </div>
 
-  <!-- sigma -->
+  <!-- Pente de la fonction sigmoïde (SIGMA) -->
   <div class="param-item">
     <label>Sigma (pente sigmoïde)</label>
     <input type="number" name="sigma" value="1" required>
     <button type="button" class="toggle" data-name="sigma" data-value="false">Invisible</button>
   </div>
 
-  <!-- npt_moy_before_mating -->
+  <!-- Délai moyen avant mating -->
   <div class="param-item">
     <label>Nombre de pas de temps moyen avant mating</label>
     <input type="number" name="npt_moy_before_mating" value="5" required>
     <button type="button" class="toggle" data-name="npt_moy_before_mating" data-value="false">Invisible</button>
   </div>
 
-  <!-- nb_bots -->
+  <!-- nombre de bots -->
   <div class="param-item">
     <label>Nombre de bots</label>
     <input type="number" name="nb_bots" value="0" required>
     <button type="button" class="toggle" data-name="nb_bots" data-value="false">Invisible</button>
   </div>
 
-  <!-- last chance -->
+  <!-- Option last chance -->
   <div class="param-item">
     <label>Last Chance Option</label>
     <button type="button" class="value-toggle" data-name="last_chance" data-value="false">Disabled</button>
     <button type="button" class="toggle" data-value="false">Invisible</button>
   </div>
 
-  <!--données joueurs visible-->
+  <!--Paramétrage de la visibilité des données joueurs-->
   <h2>Visibilité des données joueurs</h2>
-
+  
+  <!-- Identifiant -->
   <div class="param-item">
     <label>My ID</label>
     <button type="button" class="toggle" data-name="id" data-value="false">Invisible</button>
   </div>
 
+  <!-- Valeur -->
   <div class="param-item">
     <label>My Value</label>
     <button type="button" class="toggle" data-name="value" data-value="true">Visible</button>
   </div>
 
+  <!-- Partenaire actuel -->
   <div class="param-item">
     <label>Current Partner</label>
     <button type="button" class="toggle" data-name="partner" data-value="true">Visible</button>
   </div>
 
+  <!-- Identifiant du partenaire -->
   <div class="param-item">
     <label>Partner ID</label>
     <button type="button" class="toggle" data-name="partner_id" data-value="false">Invisible</button>
   </div>
 
+  <!-- Candidat -->
   <div class="param-item">
     <label>Candidate</label>
     <button type="button" class="toggle" data-name="candidate" data-value="true">Visible</button>
   </div>
 
+  <!-- Identifiant du candidat -->
   <div class="param-item">
     <label>Candidate ID</label>
     <button type="button" class="toggle" data-name="candidate_id" data-value="false">Invisible</button>
   </div>
 
+  <!-- Durée du courtship -->
   <div class="param-item">
     <label>Courtship Timer</label>
     <button type="button" class="toggle" data-name="courtship_timer" data-value="true">Visible</button>
   </div>
 
+  <!-- Mating -->
   <div class="param-item">
     <label>Mating</label>
     <button type="button" class="toggle" data-name="mating" data-value="true">Visible</button>
   </div>
 
+  <!--Paramétrage de la visibilité des résultats joueurs-->
   <h2>Visibilité des résultats des joueurs</h2>
 
+  <!-- Valeur du partenaire obtenu -->
   <div class="param-item">
     <label>Valeur du partenaire obtenu</label>
     <button type="button" class="toggle" data-name="valeur_du_partenaire_obtenu" data-value="true">
@@ -103,6 +116,7 @@
     </button>
   </div>
 
+  <!-- Nombre de joueurs qui ont la même valeur -->
   <div class="param-item">
     <label>Nombre de joueurs qui ont ma valeur</label>
     <button type="button" class="toggle" data-name="nombre_de_joueurs_dans_ma_class" data-value="true">
@@ -110,6 +124,7 @@
     </button>
   </div>
 
+  <!-- Valeur moyenne du partenaire (même classe) -->
   <div class="param-item">
     <label>Valeur moyenne du partenaire (même classe)</label>
     <button type="button" class="toggle" data-name="moyenne_valeur_partenaire_meme_classe" data-value="true">
@@ -117,6 +132,7 @@
     </button>
   </div>
 
+  <!-- Pourcentage de la classe qui n'a pas de partenaire -->
   <div class="param-item">
     <label>Pourcentage de ma classe qui n'a pas de partenaire</label>
     <button type="button" class="toggle" data-name="pourcentage_classe_ayant_partenaire" data-value="true">
@@ -124,6 +140,7 @@
     </button>
   </div>
 
+  <!-- Nombre de pas de temps avant d'obtenir un partenaire -->
   <div class="param-item">
     <label>Nombre de pas de temps avant d'obtenir un partenaire</label>
     <button type="button" class="toggle" data-name="temps_pour_obtenir_partenaire" data-value="true">
@@ -131,6 +148,7 @@
     </button>
   </div>
 
+  <!-- Valeur -->
   <div class="param-item">
     <label>Ma valeur</label>
     <button type="button" class="toggle" data-name="nombre_de_rencontres" data-value="true">
@@ -138,6 +156,7 @@
     </button>
   </div>
 
+  <!-- Nombre de refus -->
   <div class="param-item">
     <label>Nombre de refus</label>
     <button type="button" class="toggle" data-name="nombre_de_refus" data-value="true">
@@ -145,6 +164,7 @@
     </button>
   </div>
 
+  <!-- Nombre d'acceptations -->
   <div class="param-item">
     <label>Nombre d'acceptations</label>
     <button type="button" class="toggle" data-name="nombre_d_acceptations" data-value="false">
@@ -152,6 +172,7 @@
     </button>
   </div>
 
+  <!-- Rang dans la classe -->
   <div class="param-item">
     <label>Rang dans ma classe (selon valeur du partenaire obtenu)</label>
     <button type="button" class="toggle" data-name="rang_dans_sa_classe" data-value="true">
@@ -159,6 +180,7 @@
     </button>
   </div>
 
+  <!-- Bouton pour quitter le lobby -->
   <button type="button"
     class="launch-btn"
     onclick="button_click('admin_para','create_lobby', getPayload(this.form))">
