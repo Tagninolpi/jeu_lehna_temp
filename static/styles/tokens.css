@@ -1,4 +1,14 @@
-/*import de la police*/
+/*
+Styles globaux et fondations visuelles du projet.
+Ce fichier définit :
+- les polices utilisées
+- les styles de base (body, titres, boutons, inputs)
+- les règles communes partagées par toutes les pages
+
+Il ne décrit pas des composants spécifiques de l’interface, mais fournit une base visuelle cohérente utilisée par component.css et par l’ensemble des fragments HTML.
+*/
+
+/* Import des polices utilisées dans l'ensemble du projet. La police a été choisie en respectant la gamification et l'accessibilité. */
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&family=Audiowide&display=swap');
 
 body {
@@ -8,7 +18,7 @@ body {
   background: #f6f2e9;
 }
 
-
+/* Styles des titres */
 h1, h2, h3 {
   font-family: "Audiowide", "Oxanium", Arial, sans-serif;
   text-transform: uppercase;
@@ -27,26 +37,27 @@ button {
   transition: 0.15s;
 }
 
+/* Effet visuel d'enfoncement lors du clic sur un bouton */
 button:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 #000;
 }
 
-
+/* Effet visuel au survol d'un bouton */
 button:hover {
   background: #222;
   color: #fff;
 }
 
-/* Inputs */
+/* Styles globaux des champs de saisie */
 input, select {
-  font-family: inherit;
+  font-family: inherit; /* Hérite de la police du parent */
   padding: 8px;
   border: 2px solid #222;
   background: white;
 }
 
-/* Centrage simple */
+/* Classe utilitaire pour un centrage simple du contenu */
 .center {
   text-align: center;
   margin-top: 40px;
