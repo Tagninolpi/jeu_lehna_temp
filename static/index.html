@@ -1,3 +1,13 @@
+<!--
+  Point d’entrée principal de l’application web LEHNA.
+  Ce fichier ne contient pas de contenu métier directement :
+  - il charge les styles globaux et les composants UI
+  - il fournit un conteneur (#app) dans lequel les pages sont injectées dynamiquement
+  - il initialise la logique JavaScript via main.js
+
+  Le contenu affiché est chargé dynamiquement depuis les fragments HTML et mis à jour via WebSocket (voir main.js).
+-->
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,17 +15,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jeu LEHNA</title>
 
-  <link rel="stylesheet" href="styles/tokens.css">
-  <link rel="stylesheet" href="styles/layout.css">
-  <link rel="stylesheet" href="styles/components.css">
-  <link rel="stylesheet" href="styles/animations.css">
-  <link rel="stylesheet" href="styles/hidden.css">
+  <link rel="stylesheet" href="styles/tokens.css"> <!-- Styles globaux (polices, styles de base) -->
+  <link rel="stylesheet" href="styles/components.css">  <!-- Styles des composants UI (cards, HUD, boutons, etc.) -->
+  <link rel="stylesheet" href="styles/hidden.css"> <!-- Classes utilitaires (ex: .hidden) utilisées dynamiquement par le JS -->
 </head>
 
+<!-- Conteneur principal de l’application : les fragments HTML y sont injectés dynamiquement par main.js -->
 <body>
   <div id="app"></div>
-
   <script src="main.js"></script>
-
 </body>
+
 </html>
