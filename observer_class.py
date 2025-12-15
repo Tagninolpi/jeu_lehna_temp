@@ -1,12 +1,12 @@
 import asyncio
 
-# Ecoute les actions du coté client => dit au server de faire des actions.
+# listen to the client actions(button presses) => tell the server what to do
 class Observer:
     def __init__(self, server):
-        self.server = server  #reference au server
-        self.message_queue = server.message_queue  # list des messages recu du client (html=>main.js=>app.py=>ici)
+        self.server = server  #reference to the server
+        self.message_queue = server.message_queue  # list of the client messages(actions) (html=>main.js=>app.py=>here)
 
-    async def message_listener(self): # appelé au lancement de l'app (app.py)
+    async def message_listener(self): # called on app launch (app.py)
         while True:
             client_id, msg = await self.message_queue.get() 
             '''
@@ -15,7 +15,7 @@ class Observer:
             page_name = msg["page"]
             button = msg["button"]
 
-            # selon le bouton clicker dit au server de faire qqchose
+            # depending on the client action => tells the server what function to execute
             if page_name == "main_menu":
                 if button == "player":
                     await self.server.join_lobby(client_id)
@@ -60,7 +60,7 @@ class Observer:
                 else:
                     print(f"{button} is not valid")
 
-            elif page_name == "pre_game":
+            elif page_name == "pre_game": # not neccessary, can be deleted (to verify)
                 if button == "load_page":
                     await self.server.pre_game(client_id)
                 else:

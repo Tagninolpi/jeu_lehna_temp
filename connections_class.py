@@ -1,16 +1,16 @@
 from game_class import Game
-#gestion des connexions WebSocket (Joueurs et Admin)
+#manage the Websocket connections (players and Admin)
 class Connections():
     def __init__(self):
-        self.websockets = {} # {"admin ou player id": object WS} ajout depuis (app.py)
-        self.lobby = {} #{"game id" (=0):["id_joueur1",id_joueur2",...]} (ajout depuis server_class.py join_lobby())  1 seul jeu à tous moment 
-        self.game = None # instance de la class Game() game_class.py ajout depuis server_class.py create_lobby()
-        self.admin_id = None # id de l'admin de la partie  1 seul admin à la fois, ajout depuis server_class.py become_admin()
+        self.websockets = {} # {"admin or player id": WS object} set in (app.py)
+        self.lobby = {} #{"game id" (=0):["player1_id",player2_id",...]} (set in server_class.py join_lobby())  1 game at any time
+        self.game = None # instance of the class Game() game_class.py set in server_class.py create_lobby()
+        self.admin_id = None # duplicat of server class can be deleted (to verify)
         
 
     async def disconnect(self, client_id: str):
-        # supprime et deconnect client_id de lobby (aussi utilisé pendant game)
-        #lobby = {0:["id_joueur1",id_joueur2",...]}
+        # delete and disconnect client_id from lobby
+        #lobby = {0:["player1_id,player2_id",...]}
         lobby_list = self.lobby.get(0) if isinstance(self.lobby, dict) else None
         if isinstance(lobby_list, list) and client_id in lobby_list:
             lobby_list.remove(client_id)
@@ -23,8 +23,8 @@ class Connections():
                 print(e)
 
     async def update_value_all(self, targets, info_dict):
-        # server_class.py => ici => main.js => html
-        # prend tout type de structure pour targets : None,str,list,dict,list,set,tupples => list d'ids
+        # server_class.py => here => main.js => html
+        # can take any type of structure for targets : None,str,list,dict,list,set,tupples => list d'ids
         if targets is None:
             target_ids = list(self.websockets.keys()) 
         elif isinstance(targets, str):
@@ -35,13 +35,13 @@ class Connections():
             # list, set, tuple
             target_ids = list(targets)
 
-        # info_dict contient {"id_champ_html":("nouvelle_valeur","bool_visibilité")}
+        # info_dict contains {"id_of_the_html_value_id":("new_value","bool_visibility")}
         msg = {
             "type": "ui_update",
             "payload": info_dict
         }
 
-        to_remove = [] # si deconnecté
+        to_remove = [] # if disconnected
 
         for client_id in target_ids:
             ws = self.websockets.get(client_id)
@@ -49,16 +49,16 @@ class Connections():
                 to_remove.append(client_id)
                 continue
             try:
-                await ws.send_json(msg) # envoi à main.js
+                await ws.send_json(msg) # send to main.js
             except Exception:
                 to_remove.append(client_id)
 
-        # deconnecter les clients proprement
+        # disconnect clients properly
         for client_id in to_remove:
             await self.disconnect(client_id)
         
     async def change_page(self, targets, new_page):
-        # Normalise les target comme pour update_vale_all()
+        # Normalise the targets like in update_vale_all()
         if targets is None:
             target_ids = list(self.websockets.keys())
         elif isinstance(targets, str):
@@ -66,7 +66,7 @@ class Connections():
         else:
             target_ids = list(targets)
         
-        #new_page = "nom_page_html"
+        #new_page = "name_page_html"
         msg = {"type": "change_page", "payload": new_page}
 
         to_remove = []
