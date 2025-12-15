@@ -9,14 +9,16 @@ class Player:
         self.partner_id = "0" #id
         self.courtship_timer = 0
         self.mating = "waiting"
-        self.accept_candidate = True #contain the choice of the player of accept a candidate partner or not
+        self.accept_candidate = True #contain the choice of the player : accept the candidate as new partner or not
 
     def __repr__(self):
         return f"Joueur({self.id}, affichage={self.display_value:.2f}, classe={self.value_class})"
 
     def player_info(self,visibility_dict): #give the player information in the form of a dictionnary
+        # used in server to update the player visuals
         change = self.accept_candidate
-        if self.candidate_id == self.partner_id:
+        if self.candidate_id == self.partner_id:# inverse the choice for visibility
+            #: if accept hide button (by default visible) (hide when mate)
             change = False
         player_info = {
                     "id": (self.id,visibility_dict["id"][1]),
@@ -33,7 +35,7 @@ class Player:
         return player_info
 
     def build_class_thresholds(self,nb_classes: int) -> list[tuple[int, float]]:
-        #define N classes with (1 class by tuple) of reproductive values
+        #define N classes with (1 class per tuple) of reproductive values
         #each tuple contain :
         #a reproductive value for individuals (between 1 and N)
         #the upper limit for a random number to correspond with this class (the lower limit is the upper limit of the preceding class)
@@ -41,8 +43,6 @@ class Player:
             raise ValueError("nb_classes doit être >= 1")
         step = 1.0 / nb_classes
         thresholds = [(i + 1, (i + 1) * step) for i in range(nb_classes)]
-        #print(thresholds[-1])
-        #thresholds[-1] = (thresholds[-1][0], 1.0)  ligne qui sert à rien
         return thresholds
 
     def value_to_class(self,v: float, thresholds: list[tuple[int, float]]) -> int:
@@ -57,12 +57,9 @@ class Player:
         return 1
     
     def set_value(self,nb_class): #set a value to a player
-        beta_value = np.random.beta(3,3) #randow draw with a beta distribution close to a normal distribution
-        #print(beta_value)
+        beta_value = np.random.beta(3,3) #randow draw from a beta distribution similar to a normal distribution
         thresholds = self.build_class_thresholds(nb_class) #define the classes (value and thresold of each class)
-        #print(thresholds)
         class_value = self.value_to_class(beta_value,thresholds) #give the reproductive value of the corresponding class
-        #print(class_value)
         return class_value
     
     def reset_player(self,class_nb):
