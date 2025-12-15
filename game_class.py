@@ -9,9 +9,9 @@ class Game:
         self.all_players = {}
 
         #Player id list : [P1_id,P2_id, ... ]
-        self.active_players = []
+        self.active_players = [] #list of non-mating player (in a state of courtship or single)
         self.mating_players = []
-        self.changing_players = []
+        self.changing_players = [] #list of player who want to change their partner for the candidate partner
  
         #Player id pairs list : [(p1_id,p3_id),(p2_id,p4_id), ... ]
         self.previous_pairs = []
@@ -52,6 +52,8 @@ class Game:
 
 
     def sigmoid_probability(self)->tuple:
+        #return the probability distribution to move up to "mate" state depending on the time passed in "courtship" state
+        #in the form of a tuple of probability with one probability for each step of time until the probability is equal to one
         t=0
         L=[round(1/(1+math.exp(self.sigmoid_proba_turn_to_mate*self.sigmoid_proba_sigma)), 3)]
         while L[t]<1:
@@ -78,10 +80,12 @@ class Game:
         #    await server.send_player_update(id)
         #await server.broadcast("You got a new candidate")
 
-    def encounter(self):
+    def encounter(self): #to each player associate randomly a candidate partner
         rng = np.random.default_rng()
 
         def pair_from_ids(lst: list[str]):
+            #cut the list of player id in groups of 2 player id and return theses groups in a form of a list of tuples
+            #in the case where the number of player is odd (len(lst) % 2!=0) the last player id is ignored
             return [(lst[i], lst[i+1]) for i in range(0, len(lst) - len(lst) % 2, 2)]
 
         if not self.previous_pairs:
@@ -89,8 +93,8 @@ class Game:
             return pair_from_ids(self.active_players)
 
         # 1. Shuffle once
-        rng.shuffle(self.active_players)
-        current_pairs = pair_from_ids(self.active_players)
+        rng.shuffle(self.active_players) #randomly rearrange active players
+        current_pairs = pair_from_ids(self.active_players) #associate to each player a candidate partner
 
         if len(current_pairs) == 1:
             # Only 2 players left, keep the single pair as is
@@ -98,6 +102,7 @@ class Game:
             return current_pairs
 
         # 2. Separate good and bad pairs
+        #a pair is bad if and only if it already existed in the previous step of time
         prev_set = set(self.previous_pairs)
         good_pairs = []
         bad_pairs = []
@@ -180,6 +185,7 @@ class Game:
         return pair_from_ids(self.active_players) """
     
     def after_choose(self):
+        #update the state of each player depending on their choices (change or not)
         # list de tous les ids de joueurs qui veulent changer = changing_players
         # list de tous les ids de joueurs actif = active_players
         remove=[]
@@ -190,7 +196,7 @@ class Game:
             if candidate_id in self.changing_players:
                 me.partner = me.candidate
                 me.partner_id = me.candidate_id
-                me.courtship_timer = -999999
+                me.courtship_timer = -999999 #tmp value for mark this player as in courtship state for this step onwards
             else:# sinon je ne peux pas changer enlevé de la list pour changer
                 remove.append(id)
         for id in remove:
@@ -217,9 +223,10 @@ class Game:
                     me.courtship_timer += 1
                 
     def tryToMate(self)->bool:
+        #for each player in courstship state apply a probability to move up to mating state
         print(f"activeplayer {len(self.active_players)}")
         pairs = []
-        for id in self.active_players:
+        for id in self.active_players: #register pairs with couples in the form of tuples (id_X, id_partner_of_X)
             if self.all_players[id].partner_id:
                 if any(id in t for t in pairs):# if id in pairs
                     pass
@@ -230,17 +237,19 @@ class Game:
             courtship_time = me.courtship_timer
             if me.partner_id != "0":
                 partner = self.all_players[pair[1]]
+                #if in a 'courtship' state (not single (courtship_time<0) or mate (mating = "mate"))
                 if courtship_time >0 and me.mating != "mate":
                     proba =random.random()
                     #print(courtship_time)
                     if courtship_time < len(self.sigmoid_proba):
                         mate_threachold = self.sigmoid_proba[courtship_time]
                     else:
-                        mate_threachold = 1.3 
+                        mate_threachold = 1.3 #if courtship_time>len(self.sigmoid_proba)-->move up to 'mate' state
                      
-                    if proba < mate_threachold:                            
+                    if proba < mate_threachold: #move up to 'mate' state                         
                         self.mating_players.append(me.id)
                         self.mating_players.append(partner.id)
+                        #a player in 'mate' state is no longer active
                         self.active_players.remove(me.id)
                         self.active_players.remove(partner.id)
                         me.mating = "mate"
@@ -248,7 +257,7 @@ class Game:
                         me.courtship_timer = 0
                         partner.courtship_timer = 0
 
-    def end_turn_clean_up(self):
+    def end_turn_clean_up(self): #
         self.changing_players.clear()
         self.round += 1
         print(f"round{self.round}")
