@@ -1,167 +1,167 @@
 # Mating Game - LEHNA
 
-## Contexte
+## Context
 
-Selon la théorie de l’évolution, les individus cherchent à se reproduire avec des partenaires de haute qualité, afin d’augmenter les chances de survie et de reproduction de leur descendance. On sait aujourd’hui que les animaux sont capables d’évaluer la qualité d’un partenaire potentiel et de faire des choix qui maximisent leur succès reproductif.
+According to evolutionary theory, individuals seek to reproduce with high-quality partners in order to increase the chances of survival and reproduction of their offspring. It is now known that animals are able to assess the quality of a potential partner and make choices that maximize their reproductive success.
 
-Cependant, les choix effectués par les individus ne sont pas toujours strictement rationnels. Des études ont montré que, dans certaines situations, un individu peut refuser un partenaire de meilleure qualité que celui avec lequel il est déjà en couple, ou au contraire choisir un nouveau partenaire de qualité inférieure. Ce comportement, en apparence “irrationnel”, constitue en réalité une réponse adaptative : il peut favoriser la stabilité des couples et, sur le long terme, améliorer le succès reproductif. Autrement dit, ce que l’on appelle un biais comportemental n’est pas forcément une erreur de jugement, mais peut être une adaptation évolutive avantageuse, avec un grand impact évolutif.
+However, the choices made by individuals are not always strictly rational. Studies have shown that, in certain situations, an individual may refuse a higher-quality partner than the one they are already paired with, or conversely choose a new partner of lower quality. This seemingly “irrational” behavior actually constitutes an adaptive response: it can promote pair stability and, in the long term, improve reproductive success. In other words, what is called a behavioral bias is not necessarily an error in judgment, but may be an advantageous evolutionary adaptation with a major evolutionary impact.
 
-Les chercheurs du LEHNA ont souhaité créer une situation expérimentale permettant de mettre en évidence ce biais adaptatif, à l'aide d’un jeu interactif reproduisant les mécanismes du modèle, afin d’observer l’existence du biais chez l’humain et d’analyser son comportement au cours de la saison de reproduction simulée.
+Researchers at LEHNA wanted to create an experimental situation making it possible to highlight this adaptive bias, using an interactive game reproducing the mechanisms of the model, in order to observe the existence of this bias in humans and analyze their behavior over the course of the simulated breeding season.
 
-## Utilité du jeu par rapport au modèle existant
+## Usefulness of the game compared to the existing model
 
-L’objectif de ce projet est de concevoir un jeu interactif simulant une saison de reproduction, dans laquelle chaque joueur doit choisir ses partenaires au fil du temps. Le jeu se base sur un modèle biologique inspiré du travail du LEHNA, dans lequel les individus doivent décider de garder leur partenaire actuel ou de changer pour un nouveau candidat.
+The objective of this project is to design an interactive game simulating a breeding season, during which each player must choose partners over time. The game is based on a biological model inspired by the work of LEHNA, in which individuals must decide whether to keep their current partner or switch to a new candidate.
 
-Une population composée de plusieurs joueurs interagit pendant la simulation. Les individus sont appariés aléatoirement pour former des couples. À chaque tour, le joueur doit décider s’il souhaite conserver son partenaire actuel ou le changer. En d’autres termes, le joueur doit élaborer une stratégie afin de maximiser la qualité du partenaire avec lequel il se reproduit (mate) avant la fin de la saison.
+A population composed of several players interacts during the simulation. Individuals are randomly paired to form couples. At each round, the player must decide whether to keep their current partner or change. In other words, the player must develop a strategy in order to maximize the quality of the partner with whom they reproduce (mate) before the end of the season.
 
-Ce jeu poursuit deux objectifs principaux :
+This game pursues two main objectives:
 
-1. **Un objectif pédagogique et expérimental** : Le jeu doit permettre aux étudiants et aux joueurs de comprendre comment les biais de décision influencent les comportements. Il amène à se questionner sur la manière dont ces biais peuvent être modélisés, et sur le fait qu’un biais optimal n’est pas toujours intuitif. En manipulant les paramètres du jeu (temps restant dans la saison, durée du courtship, etc.), le joueur découvre que la stratégie la plus rationnelle n’est pas toujours la plus efficace à long terme.
+1. **A pedagogical and experimental objective**: The game must allow students and players to understand how decision biases influence behavior. It leads to questioning how these biases can be modeled, and the fact that an optimal bias is not always intuitive. By manipulating the game parameters (time remaining in the season, duration of courtship, etc.), the player discovers that the most rational strategy is not always the most effective in the long term.
 
-2. **Un objectif de médiation scientifique** : Dans un cadre de vulgarisation (forum, exposition ou présentation grand public), le jeu illustre le fait qu’un biais humain, souvent perçu comme irrationnel, peut en réalité avoir une valeur adaptative.
+2. **A science communication objective**: In a popularization context (forum, exhibition, or public presentation), the game illustrates the fact that a human bias, often perceived as irrational, can in reality have adaptive value.
 
-### Description de l'existant
+### Description of the existing model
 
-Les chercheurs du LEHNA ont construit un modèle fréquence-dépendant permettant d’estimer les biais émotionnels adaptatifs attendus en fonction de la qualité des individus, du temps restant dans la saison, et du temps déjà passé en courtship.
+LEHNA researchers have built a frequency-dependent model making it possible to estimate the expected adaptive emotional biases as a function of individual quality, time remaining in the season, and time already spent in courtship.
 
-Dans le modèle, chaque individu peut occuper trois états :
-- **Célibataire** : sans partenaire ;
-- **Courtship** : en phase d’évaluation du partenaire ;
-- **Mate** : partenaire accepté, reproduction réussie.
+In the model, each individual can occupy three states:
+- **Single**: without a partner;
+- **Courtship**: in the partner evaluation phase;
+- **Mate**: partner accepted, successful reproduction.
 
-Ce modèle repose sur une population théorique infinie dont les valeurs de qualité suivent une loi normale tronquée entre 0 et 1, nommée loi beta. Des classes de valeurs ont été définies afin de limiter l’hétérogénéité et de mieux représenter les interactions entre individus de niveaux de qualité similaires.
+This model is based on a theoretical infinite population whose quality values follow a normal distribution between 0 and 1, called the beta distribution. Classes of values have been defined in order to limit heterogeneity and better represent interactions between individuals of similar quality levels.
 
-La probabilité de “mating” (reproduction) entre deux individus en phase de “courtship” (interaction préalable à l’accouplement) est modélisée par une fonction sigmoïde. L’axe des abscisses représente le nombre de pas de temps passés en courtship, et l’axe des ordonnées la probabilité de passage en “mate”. Cette probabilité augmente progressivement avec la durée du courtship, jusqu’à un point d’inflexion au-delà duquel la probabilité de reproduction devient rapidement maximale.
+The probability of “mating” (reproduction) between two individuals in the “courtship” phase (interaction prior to mating) is modeled by a sigmoid function. The x-axis represents the number of time steps spent in courtship, and the y-axis the probability of transition to “mate”. This probability gradually increases with the duration of courtship, up to an inflection point beyond which the probability of reproduction quickly becomes maximal.
 
-Il faut comprendre que ce biais n’est pas une erreur de jugement, mais une adaptation évolutive. Autrement dit, ce que l’on qualifie de “biais émotionnel” correspond à une stratégie adaptative qui favorise la stabilité des couples et augmente la probabilité de reproduction à long terme. L’émotion, loin d’être une déviation irrationnelle, est donc un mécanisme fonctionnel qui soutient la réussite évolutive des individus.
+It should be understood that this bias is not an error in judgment, but an evolutionary adaptation. In other words, what is referred to as an “emotional bias” corresponds to an adaptive strategy that promotes pair stability and increases the probability of reproduction in the long term. Emotion, far from being an irrational deviation, is therefore a functional mechanism that supports the evolutionary success of individuals.
 
-## Description du jeu
+## Game description
 
-Le jeu interactif simule une saison de reproduction où les joueurs doivent choisir leurs partenaires. Voici les mécanismes principaux :
+The interactive game simulates a breeding season during which players must mutually choose their partners. The main mechanisms are as follows:
 
-### Logique de début de jeu
-1. **Création du lobby** : L’administrateur crée une partie (le “lobby”) depuis l’interface, en établissant une connexion WebSocket avec le serveur. Grâce à cette connexion, l’admin envoie les paramètres de la partie au serveur. Le serveur crée une instance unique de lobby contenant ces paramètres.
-2. **Connexion des joueurs** : En chargeant la page, le joueur fait un GET pour vérifier le statut du lobby. Si un lobby existe, ils peuvent le rejoindre. Le serveur notifie l’admin du nombre de joueurs connectés.
-3. **Lancement de la partie** : L’administrateur peut lancer la partie une fois que suffisamment de joueurs sont connectés. Le serveur assigne une valeur à chaque joueur (tirée d’une distribution) et démarre la boucle principale du jeu (tâche asynchrone). L’administrateur accède alors à sa page de visualisation en direct, tandis que les joueurs sont dirigés vers la page de jeu.
+### Game start logic
+1. **Lobby creation**: The administrator creates a game (the “lobby”) from the interface by establishing a WebSocket connection with the server. Through this connection, the admin sends the game parameters to the server. The server creates a unique lobby instance containing these parameters.
+2. **Player connection**: When loading the page, the WebSocket checks the lobby status. If a lobby exists, players can join it. The server notifies the admin of the number of connected players.
+3. **Game launch**: The administrator can start the game once enough players are connected. The server assigns a value to each player (drawn from a distribution) and starts the main game loop (asynchronous task). The administrator then accesses the live visualization page, while players are redirected to the game page.
 
-### Logique pendant le jeu
-Le cœur du jeu se déroule dans une boucle principale côté serveur (asynchrone). Les WebSockets assurent la communication bidirectionnelle en temps réel.
+### Logic during the game
+The core of the game runs in an asynchronous main loop on the server side. WebSockets ensure real-time bidirectional communication.
 
-1. **Formation des paires** : Le serveur sélectionne aléatoirement des paires parmi les joueurs actifs (non encore en “mating”). Chaque joueur reçoit via WebSocket la valeur de son partenaire et les informations visibles.
-2. **Phase de choix** : Un timer interne démarre (ex. 60 secondes). Chaque joueur peut cliquer sur “accepter”. Le clic envoie un message au serveur via WebSocket.
-3. **Fin du timer et évaluation** : À la fin du timer, si les deux joueurs se sont mutuellement acceptés, un courtship est créé. Pour chaque couple en courtship, le serveur calcule une probabilité de passage en mating (fonction sigmoïde). Si atteinte, le couple passe en mating et est retiré du pool actif.
+1. **Pair formation**: The server randomly selects pairs among active players (not yet in “mating”). Each player receives via WebSocket the value of their partner and the visible information.
+2. **Choice phase**: An internal timer starts (e.g., 60 seconds). Each player can click on “accept”. The click sends a message to the server via WebSocket.
+3. **End of timer and evaluation**: At the end of the timer, if both players have mutually accepted, a courtship is created. For each couple in courtship, the server calculates a probability of transition to mating (sigmoid function). If reached, the couple enters mating and is removed from the active pool.
 
-### Fin de la partie
-La boucle s’arrête lorsqu’il n’y a plus de joueurs actifs ou à la fin de la saison. Le serveur envoie les résultats finaux via WebSocket. Chaque joueur visualise ses statistiques, l’admin peut télécharger un CSV récapitulatif.
+### End of the game
+The loop stops when there are no more active players or at the end of the season. The server sends the final results via WebSocket. Each player views their statistics, and the admin can download a summary CSV of the choices made by players.
 
-### Paramétrage du jeu
-L’administrateur peut configurer :
-- Nombre de pas de temps (npt) d’une saison
-- Npt de courtship (inflexion de la sigmoïde)
-- Temps pour faire son choix
-- Autres paramètres par défaut.
+### Game parameterization
+The administrator can configure:
+- Number of time steps (npt) of a season
+- Courtship npt (sigmoid inflection)
+- Time to make a choice
+- Other default parameters.
 
-Chaque paramètre peut être rendu visible ou non aux joueurs.
+Each parameter can be made visible or not to the players.
 
-## Comment l'utiliser
+## How to use
 
-### Prérequis
-- Python 3.8 ou supérieur
-- Un navigateur web moderne (Chrome, Firefox, Safari, etc.)
-- Connexion Internet pour les WebSockets
+### Prerequisites
+- Python 3.8 or higher
+- A modern web browser (Chrome, Firefox, Safari, etc.)
+- Internet connection for WebSockets
 
-### 1) En local avec l'environnement virtuel
-1. Clonez ou téléchargez le projet dans un répertoire local.
-2. Créez un environnement virtuel :
+### 1) Locally with a virtual environment
+1. Clone or download the project into a local directory.
+2. Create a virtual environment:
    ```
    python -m venv venv
    source venv/bin/activate
    ```
-3. Installez les dépendances :
+3. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
-4. Lancez le serveur :
+4. Start the server:
    ```
    uvicorn app:app --host 0.0.0.0 --port 8000 --reload
    ```
-5. Ouvrez votre navigateur et accédez à `http://localhost:8000`.
-6. L’administrateur peut ensuite créer un lobby et rejoindre la partie sur d'autres onglets.
+5. Open your browser and go to `http://localhost:8000`.
+6. The administrator can then create a lobby and join the game from other tabs.
 
-### 2) En ligne avec Render
-Le projet est configuré pour un déploiement sur Render (voir `render.yaml`).
-1. Créez un compte sur Render et liez votre repository GitLab.
-2. Déployez l'application en utilisant les paramètres par défaut (port via `$PORT`).
-3. Une fois déployé, obtenez l'URL publique (ex. `https://votre-app.onrender.com`).
-4. Partagez l'URL : Les utilisateurs accèdent directement via leur navigateur pour jouer.
-5. Le serveur reste en ligne en continu (utilisez Uptimerobot pour éviter les interruptions).
+### 2) Online with Render
+The project is configured for deployment on Render (see `render.yaml`).
+1. Create an account on Render and link your GitLab repository.
+2. Deploy the application using the default settings (port via `$PORT`).
+3. Once deployed, obtain the public URL (e.g., `https://your-app.onrender.com`).
+4. Share the URL: users access it directly via their browser to play.
+5. The server remains online continuously (use Uptimerobot to avoid interruptions).
 
-## Architecture technique
+## Technical architecture
 
 ### Backend (Python/FastAPI)
-- **app.py** : Point d’entrée FastAPI, gestion routes et WebSockets.
-- **server_class.py** : Logique serveur, gestion messages, lobby, admin.
-- **game_class.py** : Cœur du jeu, logique rounds, appariements, probabilités.
-- **player_class.py** : Modèle joueurs, calcul valeurs/classes.
-- **connections_class.py** : Gestion connexions WebSocket, mises à jour UI.
-- **observer_class.py** : Listener asynchrone pour messages en file d’attente.
-- **file_management.py** : Gestion fichiers (CSV).
+- **app.py**: FastAPI entry point, route and WebSocket management.
+- **server_class.py**: Server logic, message handling, lobby, admin.
+- **game_class.py**: Core game logic, rounds, pairings, probabilities.
+- **player_class.py**: Player model, value/class calculations.
+- **connections_class.py**: WebSocket connection management, UI updates.
+- **observer_class.py**: Asynchronous listener for queued messages.
 
 ### Frontend (HTML/JS/CSS)
-- **index.html** : Conteneur principal, charge styles et scripts.
-- **main.js** : Logique JavaScript pour WebSockets, chargement dynamique fragments HTML.
-- **Fragments HTML** (dans `static/fragments/`) : Pages pour menu, lobby, résultats.
-- **Styles** : `tokens.css` (variables), `components.css` (UI), `hidden.css` (utilitaires).
-- **Sons** : Effets audio dans `static/sounds/`.
+- **index.html**: Main container, loads styles and scripts.
+- **main.js**: JavaScript logic for WebSockets, dynamic loading of HTML fragments.
+- **HTML Fragments** (in `static/fragments/`): Pages for menu, lobby, results.
+- **Styles**: `tokens.css` (variables), `components.css` (UI), `hidden.css` (utilities).
+- **Sounds**: Audio effects in `static/sounds/`.
 
 ### Technologies
-- **FastAPI** : Framework web asynchrone pour API et WebSockets.
-- **Uvicorn** : Serveur ASGI.
-- **NumPy** : Calculs mathématiques.
-- **WebSockets** : Communication temps réel.
-- **JavaScript vanilla** : Gestion front-end.
+- **FastAPI**: Asynchronous web framework for APIs and WebSockets.
+- **Uvicorn**: ASGI server.
+- **NumPy**: Mathematical computations.
+- **WebSockets**: Real-time communication.
+- **Vanilla JavaScript**: Front-end management.
 
-### Sécurité
-- Validation messages WebSocket.
-- Anonymisation des données (pas de RGPD applicable).
+### Security
+- WebSocket message validation.
+- Data anonymization (no GDPR applicable).
 
-## Développement et contribution
+## Development and contribution
 
-### Structure du projet
+### Project structure
 ```
 /
-├── app.py                 # Serveur principal
-├── game_class.py          # Logique du jeu
-├── player_class.py        # Modèle joueur
-├── server_class.py        # Gestion serveur
-├── connections_class.py   # Connexions WebSocket
-├── observer_class.py      # Traitement messages
-├── file_management.py     # Gestion fichiers
-├── requirements.txt       # Dépendances
-├── render.yaml            # Déploiement
+├── app.py                 # Main server
+├── game_class.py          # Game logic
+├── player_class.py        # Player model
+├── server_class.py        # Server management
+├── connections_class.py   # WebSocket connections
+├── observer_class.py      # Message processing
+├── file_management.py     # File management
+├── requirements.txt       # Dependencies
+├── render.yaml            # Deployment
 └── static/
     ├── index.html
     ├── main.js
-    ├── fragments/         # Pages HTML
+    ├── fragments/         # HTML pages
     ├── styles/            # CSS
     └── sounds/            # Audio
 ```
 
-### Tests et débogage
-- Lancez en mode `--reload` pour développements.
-- Utilisez outils débogage navigateur pour WebSockets.
-- Tests manuels à chaque fonctionnalité.
+
+### Testing and debugging
+- Run in `--reload` mode for development.
+- Use browser debugging tools for WebSockets.
+- Manual testing for each feature.
 
 ### Contribution
-- Forkez le repo GitLab, créez branche pour modifications.
-- Respectez style code (PEP 8 Python, conventions JS).
-- Testez localement avant PR.
+- Fork the GitLab repository, create a branch for modifications.
+- Respect code style (PEP 8 for Python, JS conventions).
+- Test locally before submitting a PR.
 
 ### FAQ
-- **Le jeu ne se lance pas ?** Vérifiez port 8000 libre, dépendances installées.
-- **Problèmes WebSocket ?** Support navigateur, pas de firewall.
-- **Comment ajouter sons ?** Placez dans `static/sounds/`, référencez en JS.
-- **Données CSV vides ?** Assurez partie jouée, admin télécharge après fin.
+- **The game does not start?** Check that port 8000 is free and dependencies are installed.
+- **WebSocket issues?** Browser support, no firewall blocking.
+- **How to add sounds?** Place them in `static/sounds/` and reference them in JS.
+- **Empty CSV data?** Ensure the game was played and the admin downloads after the end.
+- **Browser does not refresh my changes?** During development on HTML and JavaScript files, the browser may cache resources. Open the page inspector, go to the "Network" tab, check "Disable cache", and keep the inspector open while making changes.
 
-Pour détails techniques, consultez commentaires code source.</content>
-<parameter name="filePath">
+For technical details, see comments in the source code.
