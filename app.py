@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.responses import StreamingResponse
+from fastapi import Response
 from contextlib import asynccontextmanager
 
 from server_class import Server
@@ -28,6 +29,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/")
 async def root():
     return RedirectResponse("/static/index.html")
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+@app.head("/health")
+async def health_head():
+    return Response(status_code=200)
+
 
 # create WebSoclet endpoint (runs when a client opens the first page)
 @app.websocket("/ws")
