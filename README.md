@@ -29,7 +29,7 @@ In the model, each individual can occupy three states:
 - **Courtship**: in the partner evaluation phase;
 - **Mate**: partner accepted, successful reproduction.
 
-This model is based on a theoretical infinite population whose quality values follow a normal distribution between 0 and 1, called the beta distribution. Classes of values have been defined in order to limit heterogeneity and better represent interactions between individuals of similar quality levels.
+This model is based on a theoretical infinite population whose quality values follow a distribution between 0 and 1, called the beta distribution. Classes of values have been defined in order to limit heterogeneity and better represent interactions between individuals of similar quality levels.
 
 The probability of “mating” (reproduction) between two individuals in the “courtship” phase (interaction prior to mating) is modeled by a sigmoid function. The x-axis represents the number of time steps spent in courtship, and the y-axis the probability of transition to “mate”. This probability gradually increases with the duration of courtship, up to an inflection point beyond which the probability of reproduction quickly becomes maximal.
 

@@ -1,14 +1,14 @@
 /*
-Styles globaux et fondations visuelles du projet.
-Ce fichier définit :
-- les polices utilisées
-- les styles de base (body, titres, boutons, inputs)
-- les règles communes partagées par toutes les pages
+Global styles and visual foundations of the project.
+This file defines:
+- the fonts used
+- the base styles (body, headings, buttons, inputs)
+- the common rules shared by all pages
 
-Il ne décrit pas des composants spécifiques de l’interface, mais fournit une base visuelle cohérente utilisée par component.css et par l’ensemble des fragments HTML.
+It does not describe specific UI components, but provides a coherent visual base used by component.css and by all HTML fragments.
 */
 
-/* Import des polices utilisées dans l'ensemble du projet. La police a été choisie en respectant la gamification et l'accessibilité. */
+/* Import the fonts used throughout the project. The font was chosen with gamification and accessibility in mind. */
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&family=Audiowide&display=swap');
 
 body {
@@ -18,7 +18,7 @@ body {
   background: #f6f2e9;
 }
 
-/* Styles des titres */
+/* Heading styles */
 h1, h2, h3 {
   font-family: "Audiowide", "Oxanium", Arial, sans-serif;
   text-transform: uppercase;
@@ -37,27 +37,27 @@ button {
   transition: 0.15s;
 }
 
-/* Effet visuel d'enfoncement lors du clic sur un bouton */
+/* Pressed visual effect when clicking a button */
 button:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 #000;
 }
 
-/* Effet visuel au survol d'un bouton */
+/* Hover visual effect on a button */
 button:hover {
   background: #222;
   color: #fff;
 }
 
-/* Styles globaux des champs de saisie */
+/* Global styles for input fields */
 input, select {
-  font-family: inherit; /* Hérite de la police du parent */
+  font-family: inherit; /* Inherit the parent's font */
   padding: 8px;
   border: 2px solid #222;
   background: white;
 }
 
-/* Classe utilitaire pour un centrage simple du contenu */
+/* Utility class for simple content centering */
 .center {
   text-align: center;
   margin-top: 40px;
