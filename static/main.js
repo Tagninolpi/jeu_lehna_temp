@@ -1,64 +1,63 @@
 /*
-Rôle :
-Fichier central côté client du jeu.
+Role:
+Client-side central file of the game.
 
-Il gère :
-- la communication temps réel avec le backend via WebSocket
-- le chargement dynamique des pages (fragments HTML)
-- la mise à jour de l’interface utilisateur (UI) en fonction des messages serveur
-- l’envoi des actions utilisateur vers le backend (boutons, formulaires, paramètres)
+It handles:
+- real-time communication with the backend through WebSocket
+- dynamic loading of pages (HTML fragments)
+- updating the user interface (UI) based on server messages
+- sending user actions to the backend (buttons, forms, parameters)
 
-Données reçues :
-- main.js ouvre une connexion WebSocket sur l’endpoint /ws.
-- Il reçoit des messages JSON envoyés par le backend Python (scripts serveur).
-- Ces messages contiennent :
-un type (ex: change_page, ui_update)
-un payload associé aux données à afficher ou à l’action à effectuer. 
+Data received:
+- main.js opens a WebSocket connection on the /ws endpoint.
+- It receives JSON messages sent by the Python backend (server scripts).
+- These messages contain:
+  a type (e.g., change_page, ui_update)
+  a payload associated with the data to display or the action to perform.
 
+Processing:
+- Page changes are handled by loading HTML fragments from the /fragments folder.
+- Received data (game states, player values, visible parameters) is injected dynamically into the DOM via the updateUI() function.
+- Certain states trigger visual and audio effects (e.g., critical timer).
 
-Traitement :
-- Les changements de page sont gérés via le chargement de fragments HTML depuis le dossier /fragments.
-- Les données reçues (états du jeu, valeurs joueur, paramètres visibles) sont injectées dynamiquement dans le DOM via la fonction updateUI().
-- Certains états déclenchent des effets visuels et sonores (ex: timer critique).
+Data sent:
+- User actions (clicks, parameter validation, game launch) are sent to the backend via WebSocket as JSON messages.
+- These messages are then processed by the Python scripts on the server side to drive the game logic (lobby, matchmaking, turns, results).
 
-Données envoyées :
-- Les actions utilisateur (clics, validation de paramètres, lancement de partie) sont envoyées au backend via WebSocket sous forme de messages JSON.
-- Ces messages sont ensuite traités par les scripts Python côté serveur pour piloter la logique du jeu (lobby, matchmaking, tours, résultats).
-
-En résumé :
-main.js fait le lien entre l’interface web (HTML/CSS),
-les interactions utilisateur,
-et la logique métier exécutée côté backend Python.
+In summary:
+main.js links the web interface (HTML/CSS),
+user interactions,
+and the business logic executed on the Python backend.
 */
 
 
-// Indique dans la console que le fichier main.js a bien été chargé
+// Indicates in the console that the main.js file has loaded correctly
 console.log("✅ main.js chargé");
 
-// Choisit le bon protocole WebSocket selon le type de page (http / https)
+// Chooses the correct WebSocket protocol depending on the page type (http / https)
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"; 
-const wsHost = window.location.host; // Récupère l’hôte courant (ex: localhost:8000)
-const app = document.getElementById("app"); // Récupère le conteneur principal où seront injectées les pages HTML
-let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`); // Ouvre la connexion WebSocket avec le backend Python
+const wsHost = window.location.host; // Retrieves the current host (e.g., localhost:8000)
+const app = document.getElementById("app"); // Retrieves the main container where HTML pages will be injected
+let ws = new WebSocket(`${wsProtocol}://${wsHost}/ws`); // Opens the WebSocket connection with the Python backend
 
 // TIC TAC TIMER
-const ticTacSound = new Audio("/static/sounds/tictac.mp3"); // Son utilisé lorsque le temps devient critique
+const ticTacSound = new Audio("/static/sounds/tictac.mp3"); // Sound used when time becomes critical
 ticTacSound.loop = true;
 ticTacSound.volume = 0.5;
 let ticTacPlaying = false;
-let audioUnlocked = false; // Nécessaire pour éviter les blocages audio par les navigateurs
+let audioUnlocked = false; // Needed to avoid audio blocks by browsers
 
-// Cette fonction est appelée à chaque message reçu du serveur
+// This function is called for each message received from the server
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
   const { type, payload } = msg;
 
   switch (type) {
-    case "change_page": // Le serveur demande de changer de page
-      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player,admin_result,admin_download,player_result
+    case "change_page": // The server requests a page change
+      loadFragment(payload); // admin_lobby, admin, main_menu, player_lobby, player, admin_result, admin_download, player_result
       break;
     
-    case "ui_update": // Le serveur demande une mise à jour de l’interface
+    case "ui_update": // The server requests a UI update
       updateUI(payload);
       break;
 
@@ -67,16 +66,16 @@ ws.onmessage = (event) => {
   }
 };
 
-// Met à jour l’affichage à partir des données envoyées par le serveur
-// Fonction centrale d’affichage : TOUT ce que le joueur voit à l’écran passe par ici
+// Updates the display based on the data sent by the server
+// Core display function: EVERYTHING the player sees on screen goes through here
 function updateUI(dict) {
-  for (const [id, [text, visible]] of Object.entries(dict)) { // Parcourt toutes les valeurs reçues
+  for (const [id, [text, visible]] of Object.entries(dict)) { // Iterates over all received values
 
     if (id === "change") {
       const el = document.getElementById(id);
       if (!el) continue;
 
-      if (visible !== undefined) { // Le serveur décide si le bouton est visible
+      if (visible !== undefined) { // The server decides whether the button is visible
         const row = el.closest('div') || el;
         if (visible) row.classList.remove('hidden');
         else row.classList.add('hidden');
@@ -84,13 +83,13 @@ function updateUI(dict) {
       continue;
     }
 
-    const el = document.getElementById(id); // Recherche de l’élément HTML correspondant à l’id
+    const el = document.getElementById(id); // Finds the HTML element corresponding to the id
     if (!el) continue;
 
-    if (id === "status") { // Cas spécial : statut du jeu (timer)
+    if (id === "status") { // Special case: game status (timer)
       el.textContent = text;
 
-      const match = text.match(/(\d+)\s*seconds?/);  // Recherche d’un nombre de secondes dans le texte
+      const match = text.match(/(\d+)\s*seconds?/);  // Looks for a number of seconds in the text
 
       if (match) {
         const seconds = parseInt(match[1], 10);
@@ -98,7 +97,7 @@ function updateUI(dict) {
         if (seconds <= 10) {
           el.classList.add("timer-urgent");
 
-          if (audioUnlocked && !ticTacPlaying) { // Lancement du son si autorisé
+          if (audioUnlocked && !ticTacPlaying) { // Starts the sound if allowed
             ticTacSound.currentTime = 0;
             ticTacSound.play().catch(() => {});
             ticTacPlaying = true;
@@ -125,15 +124,15 @@ function updateUI(dict) {
       }
 
     } else {
-      const safeText = // Cas général : affichage de texte simple
+      const safeText = // General case: simple text display
         text === null || text === "null" || text === undefined
           ? ""
           : String(text);
 
-      if (id === "candidate") { // Le candidat est affiché sans animation
+      if (id === "candidate") { // The candidate is displayed without animation
         el.textContent = safeText;
       } else {
-        if (el.textContent !== safeText && safeText !== "") { // Animation seulement si la valeur change
+        if (el.textContent !== safeText && safeText !== "") { // Animation only if the value changes
           scrambleText(el, safeText);
         } else {
           el.textContent = safeText;
@@ -141,7 +140,7 @@ function updateUI(dict) {
       }
     }
 
-    const row = el.closest('div') || el; // Gestion de la visibilité (montrer / cacher)
+    const row = el.closest('div') || el; // Manages visibility (show / hide)
     if (visible !== undefined) {
       if (visible) row.classList.remove('hidden');
       else row.classList.add('hidden');
@@ -149,7 +148,7 @@ function updateUI(dict) {
   }
 }
 
-// Envoie une action (clic bouton) au serveur
+// Sends an action (button click) to the server
 function button_click(page, button, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({
@@ -162,22 +161,22 @@ function button_click(page, button, payload) {
   }
 }
 
-// Construit les paramètres du lobby à partir du formulaire
+// Builds the lobby parameters from the form
 function getPayload(form) {
   const payload = {};
 
-  form.querySelectorAll(".param-item").forEach(item => { // Chaque .param-item correspond à un paramètre
+  form.querySelectorAll(".param-item").forEach(item => { // Each .param-item corresponds to a parameter
     const input = item.querySelector("input");
     const toggle = item.querySelector(".toggle");
     const valueBtn = item.querySelector(".value-toggle");
 
     if (input) {
-      // Paramètre numérique + visibilité
+      // Numeric parameter + visibility
       const key = input.name;
       const value = [ Number(input.value), toggle.dataset.value === "true" ];
       payload[key] = value;
     } else if (valueBtn) {
-      // Paramètre booléen (ex: last chance)
+      // Boolean parameter (e.g., last chance)
       const key = valueBtn.dataset.name;
       const value = valueBtn.dataset.value === "true";
 
@@ -186,7 +185,7 @@ function getPayload(form) {
 
       payload[key] = [value, visible];
     } else if (toggle) {
-      // Paramètre uniquement visible / invisible
+      // Parameter that is only visible / invisible
       const key = toggle.dataset.name;
       const visible = toggle.dataset.value === "true";
       payload[key] = [0, visible];
@@ -197,7 +196,7 @@ function getPayload(form) {
 }
 
 
-// Charge un fichier HTML et l’insère dans #app (changement de page)
+// Loads an HTML file and inserts it into #app (page change)
 async function loadFragment(name) {
   try {
     const response = await fetch(`./fragments/${name}.html`);
@@ -209,7 +208,7 @@ async function loadFragment(name) {
   }
 }
 
-// Téléchargement CSV (admin)
+// CSV download (admin)
 async function downloadCSV() {
     try {
         const response = await fetch("/download_csv");
@@ -219,7 +218,7 @@ async function downloadCSV() {
         const url = URL.createObjectURL(blob);
 
         // Get filename from Content-Disposition header
-        let fileName = "error_empty_results.csv"; // défaut
+        let fileName = "error_empty_results.csv"; // default
         const disposition = response.headers.get("Content-Disposition");
         if (disposition && disposition.includes("filename=")) {
             fileName = disposition.split("filename=")[1].replace(/['"]/g, '');
@@ -227,55 +226,55 @@ async function downloadCSV() {
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = fileName; // Nom du fichier dynamique
+        a.download = fileName; // Dynamic file name
         a.click();
 
         URL.revokeObjectURL(url);
 
-        // Après téléchargement, recharger la page admin pour réinitialiser l’état
+        // After downloading, reload the admin page to reset the state
         loadFragment("admin");
     } catch (err) {
         console.error("❌ Erreur CSV:", err);
     }
 }
 
-// Cette fonction informe le serveur que le jeu peut démarrer
+// This function informs the server that the game can start
 async function start_game() {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ "page": "pre_game", "button": "load_page", "message": null })); // Envoie un message au serveur pour charger la page de pré-jeu. Le serveur décidera ensuite quoi afficher (menu, lobby, etc.)
+    ws.send(JSON.stringify({ "page": "pre_game", "button": "load_page", "message": null })); // Sends a message to the server to load the pre-game page. The server will then decide what to display (menu, lobby, etc.)
   } else {
     console.warn("WebSocket non connecté — action ignorée");
   }
 }
 
-// Écoute tous les clics sur la page
+// Listens to every click on the page
 document.addEventListener("click", (e) => {
-  const btn = e.target; // Élément cliqué
-  if (!btn.classList.contains("toggle") && !btn.classList.contains("value-toggle")) return; // On ne traite que les boutons de type toggle
+  const btn = e.target; // Clicked element
+  if (!btn.classList.contains("toggle") && !btn.classList.contains("value-toggle")) return; // Only handle toggle-type buttons
 
-  let value = btn.dataset.value === "true"; // Lecture de la valeur actuelle (true / false)
+  let value = btn.dataset.value === "true"; // Read the current value (true / false)
   value = !value;
   btn.dataset.value = value;
 
-  if (btn.classList.contains("value-toggle")) { // Mise à jour du texte affiché sur le bouton
+  if (btn.classList.contains("value-toggle")) { // Update the text displayed on the button
     btn.textContent = value ? "Enabled" : "Disabled";
   } else {
     btn.textContent = value ? "Visible" : "Invisible";
   }
 
-  btn.style.background = value ? "white" : "black"; // Mise à jour visuelle du bouton (retour utilisateur)
+  btn.style.background = value ? "white" : "black"; // Visual update of the button (user feedback)
   btn.style.color = value ? "black" : "white";
 });
 
-// Fonction appelée une seule fois au chargement de la page
+// Function called once when the page loads
 async function init() {
-  await loadFragment("main_menu"); // Charge le menu principal dans la page
-  await start_game(); // Informe le serveur que le client est prêt
+  await loadFragment("main_menu"); // Loads the main menu into the page
+  await start_game(); // Informs the server that the client is ready
 }
 
-// Effet visuel appliqué lorsqu’une valeur change à l’écran. Purement esthétique (aucun impact sur la logique du jeu).
+// Visual effect applied when a value changes on screen. Purely aesthetic (no impact on game logic).
 function scrambleText(el, newText) {
-  const chars = "!<>-_\\/[]{}—=+*^?#________"; // Liste de caractères utilisés pour l’animation
+  const chars = "!<>-_\\/[]{}—=+*^?#________"; // List of characters used for the animation
   const duration = 600;
   const steps = 20;
   let frame = 0;
@@ -283,7 +282,7 @@ function scrambleText(el, newText) {
 
   const interval = setInterval(() => {
     let output = "";
-    for (let i = 0; i < newText.length; i++) { // Construction progressive du texte final
+    for (let i = 0; i < newText.length; i++) { // Progressive construction of the final text
       if (i < (frame / steps) * newText.length) {
         output += newText[i];
       } else {
@@ -301,7 +300,7 @@ function scrambleText(el, newText) {
   }, duration / steps);
 }
 
-// Déblocage du son (navigateur)
+// Audio unlocking (browser)
 document.addEventListener("click", () => {
   if (!audioUnlocked) {
     ticTacSound.play().then(() => {
