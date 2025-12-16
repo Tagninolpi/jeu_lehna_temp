@@ -219,7 +219,7 @@ async function downloadCSV() {
         const url = URL.createObjectURL(blob);
 
         // Get filename from Content-Disposition header
-        let fileName = "results.csv"; // défaut
+        let fileName = "error_empty_results.csv"; // défaut
         const disposition = response.headers.get("Content-Disposition");
         if (disposition && disposition.includes("filename=")) {
             fileName = disposition.split("filename=")[1].replace(/['"]/g, '');

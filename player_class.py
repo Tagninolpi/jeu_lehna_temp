@@ -35,10 +35,12 @@ class Player:
         return player_info
 
     def build_class_thresholds(self,nb_classes: int) -> list[tuple[int, float]]:
-        #define N classes with (1 class per tuple) of reproductive values
-        #each tuple contain :
-        #a reproductive value for individuals (between 1 and N)
-        #the upper limit for a random number to correspond with this class (the lower limit is the upper limit of the preceding class)
+        # the reproductive values of the players are float numbers from 0-1
+        # float numbers or hard to interpret for humans, so instead they are split into threachold classes:
+        # this function takes a class numbre (defined by the admin) (ex: 10),
+        # and split the float 0-1 into 10 equal classes
+        # the maximum values of each class are saved in a tupple
+        # =>[(1,0.1),(2,0.2),(3,0.3),...] 
         if nb_classes < 1:
             raise ValueError("nb_classes doit être >= 1")
         step = 1.0 / nb_classes
@@ -46,7 +48,7 @@ class Player:
         return thresholds
 
     def value_to_class(self,v: float, thresholds: list[tuple[int, float]]) -> int:
-        #receive a random number and return the value of the corresponding classe of values
+        #receive a random float (0-1) and return the value of the corresponding classe of values
         if not (0.0 <= v <= 1.0):
             raise ValueError("v doit être dans [0,1]")
         for cls, sup in thresholds:
