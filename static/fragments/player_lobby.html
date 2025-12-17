@@ -1,22 +1,22 @@
-<!-- Fragment HTML du lobby joueur en attente de matchmaking -->
+<!-- HTML fragment for the player lobby waiting for matchmaking -->
 
 <h1>Lobby Joueur</h1>
 
-<p id="players_connected">Joueurs connectés : 0</p> <!-- Affiche le nombre de joueurs connectés -->
+<p id="players_connected">Joueurs connectés : 0</p> <!-- Displays the number of connected players -->
 
 <div id="waiting_area">
   <p>⏳ En attente de matchmaking...</p>
-  <div class="loader"></div> <!-- Indicateur visuel de chargement -->
+  <div class="loader"></div> <!-- Visual loading indicator -->
 </div>
 
-<!-- Bouton permettant au joueur de quitter le lobby -->
+<!-- Button allowing the player to leave the lobby -->
 <button type="button" style="margin-top:16px;"
           onclick="button_click('player_lobby','leave',null)">
     🏠 Quitter le lobby
 </button>
 
 <style>
-  /* Loader circulaire affiché pendant l'attente du matchmaking */
+  /* Circular loader displayed while waiting for matchmaking */
   .loader {
     border: 4px solid #ccc;
     border-top: 4px solid #333;
@@ -29,7 +29,7 @@
     margin-left: 10px;
   }
   
-  /* Animation de rotation du loader */
+  /* Loader rotation animation */
   @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }

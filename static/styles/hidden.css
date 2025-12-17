@@ -1,7 +1,7 @@
 /* 
-Classe appliquée dynamiquement par JavaScript (updateUI dans main.js) Utilisée pour masquer un élément lorsque l'administrateur choisit de ne pas transmettre la donnée au joueur 
+Class dynamically applied by JavaScript (updateUI in main.js) used to hide an element when the administrator chooses not to transmit the data to the player 
 */
 
 .hidden{
-	display: none; /* Retire complètement l'élément de l'affichage */
+	display: none; /* Completely removes the element from the display */
 }

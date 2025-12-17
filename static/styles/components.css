@@ -1,21 +1,21 @@
 /*
-Ce fichier définit les composants visuels réutilisables de l’interface (UI).
-Il décrit la structure et l’apparence des blocs fonctionnels du jeu :
-- cartes d’information (card, match-card)
-- HUD et éléments d’état (hud, tile, badge, timer)
-- formulaires et contrôles (inputs, toggles, boutons)
-- layouts spécifiques aux vues joueur (player-layout, player-main, player-candidate)
+This file defines the reusable visual components of the interface (UI).
+It describes the structure and appearance of the game's functional blocks:
+- information cards (card, match-card)
+- HUD and status elements (hud, tile, badge, timer)
+- forms and controls (inputs, toggles, buttons)
+- layouts specific to the player views (player-layout, player-main, player-candidate)
 
-Ces styles s’appuient sur les fondations globales définies dans token.css (polices, couleurs, styles de base).
+These styles rely on the global foundations defined in token.css (fonts, colors, base styles).
 
-Les données affichées dans ces composants sont injectées dynamiquement par le JavaScript (main.js) via WebSocket.
+The data displayed in these components is injected dynamically by JavaScript (main.js) via WebSocket.
 */
 
 /* ==================================================================================================================
-Cartes d'information 
+Information cards
 ===================================================================================================================== */
 
-/* Carte utilisée pour afficher une information joueur */
+/* Card used to display a player's information */
 .card {
   background: linear-gradient(145deg, #ffffff, #f1eee6);
   border: 3px solid #000;
@@ -27,7 +27,7 @@ Cartes d'information
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
-/* Titre secondaire d'une carte */
+/* Secondary title of a card */
 .card strong {
   display: block;
   font-size: 15px;
@@ -37,19 +37,19 @@ Cartes d'information
   opacity: 0.7;
 }
 
-/* Valeur principale affichée dans la carte */
+/* Main value displayed in the card */
 .card div {
   font-size: 18px;
   font-weight: 700;
 }
 
-/* Effet visuel au survol */
+/* Visual hover effect */
 .card:hover {
   transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0 #000;
 }
 
-/* Détail décoratif en haut de la carte */
+/* Decorative detail at the top of the card */
 .card::before {
   content: "";
   position: absolute;
@@ -61,7 +61,7 @@ Cartes d'information
 }
 
 /* ==================================================================================================================
-Bloc d'informations
+Information block
 ===================================================================================================================== */
 
 .info {
@@ -73,7 +73,7 @@ Bloc d'informations
 }
 
 /* ==================================================================================================================
-Cartes du candidat 
+Candidate cards
 ===================================================================================================================== */
 
 .match-card {
@@ -88,7 +88,7 @@ Cartes du candidat
   font-size: 16px; 
 }
 
-/* Valeur affichée sous forme de badge */
+/* Value displayed as a badge */
 .match-card .value-pill {
   display: inline-block;
   border: 3px solid #000;
@@ -98,10 +98,10 @@ Cartes du candidat
 }
 
 /* ==================================================================================================================
-HUD (états temps réel)
+HUD (real-time states)
 ===================================================================================================================== */
 
-/* Conteneur du HUD (statut, timer, mating, etc.) */
+/* HUD container (status, timer, mating, etc.) */
 .hud {
   display: flex;
   gap: 16px;
@@ -109,7 +109,7 @@ HUD (états temps réel)
   flex-wrap: wrap;
 }
 
-/* Tuile individuelle du HUD */
+/* Individual HUD tile */
 .hud .tile {
   background: #fff;
   border: 3px solid #000;
@@ -119,7 +119,7 @@ HUD (états temps réel)
   text-align: center;
 }
 
-/* Valeur affichée dans une tuile */
+/* Value displayed inside a tile */
 .hud .tile div {
   font-size: 22px;
   font-weight: 700;
@@ -127,7 +127,7 @@ HUD (états temps réel)
 }
 
 /* ==================================================================================================================
-Badges d'état joueur (single, courtship, mate)
+Player state badges (single, courtship, mate)
 ===================================================================================================================== */
 
 .badge {
@@ -141,7 +141,7 @@ Badges d'état joueur (single, courtship, mate)
 .badge.mate      { background: #dff7d8; }
 
 /* ==================================================================================================================
-Liste joueurs simple
+Simple player list
 ===================================================================================================================== */
 
 .list {
@@ -159,7 +159,7 @@ Liste joueurs simple
 
 
 /* ==================================================================================================================
-Champs de formulaire rétro
+Retro form fields
 ===================================================================================================================== */
 
 input[type="text"],
@@ -175,7 +175,7 @@ select, textarea {
 }
 
 /* ==================================================================================================================
-Radios / checkboxes custom
+Custom radios / checkboxes
 ===================================================================================================================== */
 
 input[type="radio"],
@@ -189,7 +189,7 @@ input[type="checkbox"] {
   margin-right: 6px;
   position: relative;
 }
-input[type="radio"] { border-radius: 0; } /* carré rétro */
+input[type="radio"] { border-radius: 0; } /* retro square look */
 input[type="checkbox"] { border-radius: 0; }
 input[type="radio"]:checked,
 input[type="checkbox"]:checked {
@@ -197,7 +197,7 @@ input[type="checkbox"]:checked {
 }
 
 /* ==================================================================================================================
-Aide de layout
+Layout helpers
 ===================================================================================================================== */
 
 .row { 
@@ -210,10 +210,10 @@ Aide de layout
 }
 
 /* ==================================================================================================================
-Paramètres du lobby
+Lobby parameters
 ===================================================================================================================== */
 
-/* Conteneur logique d'un paramètre de configuration */
+/* Logical container for a configuration parameter */
 .param-item {
   display: flex;
   align-items: center;
@@ -226,7 +226,7 @@ Paramètres du lobby
   font-weight: bold;
 }
 
-/* Boutons de visibilité / activation */
+/* Visibility/activation buttons */
 .toggle {
   padding: 5px 10px;
   border-radius: 8px;
@@ -246,22 +246,22 @@ Paramètres du lobby
 }
 
 /* ==================================================================================================================
-États dynamiques (JS)
+Dynamic states (JS)
 ===================================================================================================================== */
 
-/* Élément masqué dynamiquement par updateUI() */
+/* Element dynamically hidden by updateUI() */
 .hidden {
   display: none;
 }
 
-/* Timer critique (fin de tour imminente) : clignote en rouge */
+/* Critical timer (end of turn imminent): blinks in red */
 .timer-urgent {
   color: #c0392b;
   animation: blink 1s infinite;
   font-weight: 700;
 }
 
-/* Animation de clignotement */
+/* Blinking animation */
 @keyframes blink {
   0%   { opacity: 1; }
   50%  { opacity: 0.2; }
@@ -270,7 +270,7 @@ Paramètres du lobby
 
 
 /* ==================================================================================================================
-Effet de texte pixelisé animé
+Animated pixelated text effect
 ===================================================================================================================== */
 
 .pixel-text {
@@ -287,17 +287,17 @@ Effet de texte pixelisé animé
 }
 
 @keyframes pixel-deconstruct-rebuild {
-  /* ÉTAT NORMAL */
+  /* NORMAL STATE */
   0% {
     background-position: 0 0;
     opacity: 1;
   }
-  /* DÉCONSTRUCTION */
+  /* DECONSTRUCTION */
   30% {
     background-position: 0 40%;
     opacity: 0.6;
   }
-  /* MOMENT “CASSÉ” */
+  /* "BROKEN" MOMENT */
   50% {
     background-position: 0 70%;
     opacity: 0.3;
@@ -307,7 +307,7 @@ Effet de texte pixelisé animé
     background-position: 0 90%;
     opacity: 0.9;
   }
-  /* TEXTE NET */
+  /* SHARP TEXT */
   100% {
     background-position: 0 100%;
     opacity: 1;
@@ -315,7 +315,7 @@ Effet de texte pixelisé animé
 }
 
 /* ==================================================================================================================
-Bouton principal de lancement
+Main launch button
 ===================================================================================================================== */
 .launch-btn {
   background: #b0ee9d;
@@ -342,10 +342,10 @@ Bouton principal de lancement
 }
 
 /* ==================================================================================================================
-Layout interface joueur
+Player interface layout
 ===================================================================================================================== */
 
-/* Layout principal joueur */
+/* Main player layout */
 .player-layout {
   display: flex;
   align-items: flex-start;
@@ -353,13 +353,13 @@ Layout interface joueur
   justify-content: flex-start;
 }
 
-/* Colonne principale joueur (à gauche) */
+/* Main player column (left side) */
 .player-main {
   flex: 1;
   max-width: 640px;
 }
 
-/* Colonne candidat ( à droite) */
+/* Candidate column (right side) */
 .player-candidate {
   width: 260px;       
   border: 4px solid #000;

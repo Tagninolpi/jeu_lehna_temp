@@ -1,11 +1,11 @@
 <!--
-  Point d’entrée principal de l’application web LEHNA.
-  Ce fichier ne contient pas de contenu métier directement :
-  - il charge les styles globaux et les composants UI
-  - il fournit un conteneur (#app) dans lequel les pages sont injectées dynamiquement
-  - il initialise la logique JavaScript via main.js
+  Main entry point of the LEHNA web application.
+  This file does not contain business content directly:
+  - it loads global styles and UI components
+  - it provides a container (#app) into which pages are dynamically injected
+  - it initializes the JavaScript logic via main.js
 
-  Le contenu affiché est chargé dynamiquement depuis les fragments HTML et mis à jour via WebSocket (voir main.js).
+  The displayed content is dynamically loaded from HTML fragments and updated via WebSocket (see main.js).
 -->
 
 <!DOCTYPE html>
@@ -15,12 +15,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jeu LEHNA</title>
 
-  <link rel="stylesheet" href="styles/tokens.css"> <!-- Styles globaux (polices, styles de base) -->
-  <link rel="stylesheet" href="styles/components.css">  <!-- Styles des composants UI (cards, HUD, boutons, etc.) -->
-  <link rel="stylesheet" href="styles/hidden.css"> <!-- Classes utilitaires (ex: .hidden) utilisées dynamiquement par le JS -->
+  <link rel="stylesheet" href="styles/tokens.css"> <!-- Global styles (fonts, base styles) -->
+  <link rel="stylesheet" href="styles/components.css">  <!-- Styles for UI components (cards, HUD, buttons, etc.) -->
+  <link rel="stylesheet" href="styles/hidden.css"> <!-- Utility classes (e.g., .hidden) used dynamically by JS -->
 </head>
 
-<!-- Conteneur principal de l’application : les fragments HTML y sont injectés dynamiquement par main.js -->
+<!-- Main container of the application: HTML fragments are injected there dynamically by main.js -->
 <body>
   <div id="app"></div>
   <script src="main.js"></script>
