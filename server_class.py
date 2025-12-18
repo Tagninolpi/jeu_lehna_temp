@@ -19,7 +19,7 @@ class Server:
         self.lobby_state = "closed" # 1 unique lobby at any time
 
         self.ev_players_choose_finish = asyncio.Event() # used to stop the curretn loop and to wait for an event
-        
+
         self.timer: asyncio.Task | None = None # référence to the timer (choosing periode of the players)
         
         self.game_results = [] # list of lists of dicts
@@ -27,6 +27,9 @@ class Server:
         # [[{data player 1 pdt1},{data player 2 pdt1}...],[{data player 1 pdt2},{data player 2 pdt2}...]...]
         
         self.parameters = {} # recieved from admin.html => main.js => observer_class.py=> here create_lobby() 
+        
+        self.force_reset = False
+        self.resetting = False # reseting flag for the main game loop
 
     async def pre_game(self,client_id): # not necessary can be deleted (to verify)
         await asyncio.sleep(1)
@@ -100,6 +103,9 @@ class Server:
             # the admin can close teh game at anytime by pressing on the reset button
             await self.game_loop()
             # at the end of the game everyting is reset for the next game
+            if self.force_reset:
+                self.force_reset = False
+                return
             await self.reset_all()
 
     # can be moved to game_class.py (self.connections.lobby[0] needs to be passed as an argument)
@@ -115,7 +121,10 @@ class Server:
             self.connections.game.active_players.append(f"bot{i}")
 
     async def game_loop(self): #main game loop
-        while self.connections.game.game_status == "active":# exit flag set if end conditions true
+        while (
+        self.connections.game
+        and self.connections.game.game_status == "active"
+        and not self.resetting):# exit flag set if end conditions true
             self.ev_players_choose_finish.clear()#reset event monitor
             self.connections.game.changing_players.clear()
             self.connections.game.give_all_new_candidate() 
@@ -125,8 +134,11 @@ class Server:
             # start choose timer
             self.timer = asyncio.create_task(self.start_timer(self.connections.game.choose_time))
             await self.ev_players_choose_finish.wait() # stop loop until event cleared:
+            if self.resetting:
+                return
             # timer finished or all players choose to change
-            self.timer.cancel() # if timer not 0
+            if self.timer and not self.timer.done():
+                self.timer.cancel()# if timer not 0
             self.bot_choose()# calculate the choice of existing bots ( accept if candidate>partner)
             self.calculate_biais() # calculate the biais of the players (not bots)
             self.connections.game.after_choose() # based on the choises update the partners
@@ -145,12 +157,22 @@ class Server:
                 # add the data for every player of this turn to game results
                 self.add_turn_stats_game()
     
-    async def start_timer(self,time):
-        for i in range(time):
-            await asyncio.sleep(1)
-            await self.connections.update_value_all(set(self.connections.lobby.get(0, [])),{"status":(f"Time remaining : {time-i} seconds",True)})
-        self.connections.game.game_status = "choose_finish" # can be deleted (not be verified)
-        self.ev_players_choose_finish.set()
+
+    async def start_timer(self, time):
+        try:
+            for i in range(time):
+                await asyncio.sleep(1)
+                if self.resetting:
+                    return
+                await self.connections.update_value_all(
+                    set(self.connections.lobby.get(0, [])),
+                    {"status": (f"Time remaining : {time-i} seconds", True)}
+                )
+            if not self.resetting:
+                self.ev_players_choose_finish.set()
+        except asyncio.CancelledError:
+            return
+
 
     def bot_choose(self):
         for key,player in self.connections.game.all_players.items():
@@ -235,18 +257,23 @@ class Server:
     
     async def reset_all(self,all=False):
         # Cancel the timer if running
+        self.resetting = True
+        if self.connections.game:
+            self.connections.game.game_status = "Game end"
         if self.timer and not self.timer.done():
             self.timer.cancel()
             try:
                 await self.timer
             except asyncio.CancelledError:
                 pass
+        self.ev_players_choose_finish.set()
         # get the game results from Game instance (in the future only the server can be used)
         # the game_results variable in Game can be deleted
         self.game_results = self.connections.game.game_results
         
         if all: # admin reset game
-            self.admin_page = "main_menu"
+            self.force_reset = True
+            self.admin_page = "admin"
             await self.connections.change_page(self.admin_id, "admin")
             self.game_results = []
             await self.connections.change_page(self.connections.lobby[0],"main_menu")
@@ -272,6 +299,8 @@ class Server:
 
         # reset event manager
         self.ev_players_choose_finish.clear()
+        self.resetting = False
+
     
 
     async def send_game_results(self):
@@ -404,6 +433,7 @@ class Server:
     def get_game_result(self):
         # return csv file and it's name (date and time of creation)
         # used in app.py 
+        self.admin_page = "admin"
         if not self.game_results:
             return None, None # if no game results create empty csv
 
